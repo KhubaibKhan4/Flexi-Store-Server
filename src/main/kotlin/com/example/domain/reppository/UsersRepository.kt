@@ -55,4 +55,14 @@ class UsersRepository : UsersDao {
             UserTable.deleteWhere { UserTable.id.eq(id) }
         }
 
+    override suspend fun updateUsers(id: Long, username: String, email: String, password: String): Int =
+        DatabaseFactory.dbQuery {
+            UserTable.update({ UserTable.id.eq(id) }) { user ->
+                user[UserTable.id] = id
+                user[UserTable.username] = username
+                user[UserTable.email] = email
+                user[UserTable.password] = password
+            }
+        }
+
 }
