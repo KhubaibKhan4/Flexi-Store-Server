@@ -8,7 +8,6 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -203,41 +202,6 @@ fun Route.users(
 fun Route.category(
     db: CategoryRepository
 ) {
-    /*post("v1/categories") {
-        val parameters = call.receive<Parameters>()
-        val name = parameters["name"] ?: return@post call.respondText(
-            text = "Name Missing",
-            status = HttpStatusCode.BadRequest
-        )
-        val description = parameters["description"] ?: return@post call.respondText(
-            text = "Description Missing",
-            status = HttpStatusCode.BadRequest
-        )
-        val isVisible = parameters["isVisible"] ?: return@post call.respondText(
-            text = "isVisible Missing",
-            status = HttpStatusCode.BadRequest
-        )
-        val imageUrl = parameters["imageUrl"] ?: return@post call.respondText(
-            text = "ImageUrl Missing",
-            status = HttpStatusCode.BadRequest
-        )
-
-        try {
-            val category = db.insert(name, description, isVisible.toBoolean(), imageUrl)
-            category?.id.let { categoryId ->
-                call.respond(
-                    status = HttpStatusCode.OK,
-                    "Category Data Uploaded Successfully $category"
-                )
-            }
-
-        } catch (e: Exception) {
-            call.respond(
-                HttpStatusCode.Unauthorized,
-                "Error While Uploading Category To Server : ${e.message}"
-            )
-        }
-    }*/
     post("v1/categories") {
         val multipart = call.receiveMultipart()
         var name: String? = null
@@ -397,6 +361,7 @@ fun Route.category(
                         "isVisible" -> isVisible = part.value.toBoolean()
                     }
                 }
+
                 is PartData.FileItem -> {
                     val fileBytes = part.streamProvider().readBytes()
                     val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
@@ -411,6 +376,7 @@ fun Route.category(
                     Files.write(Paths.get(filePath), fileBytes)
                     imageUrl = "/uploads/categories/${fileName.replace(" ", "_")}"
                 }
+
                 is PartData.BinaryChannelItem -> TODO()
                 is PartData.BinaryItem -> TODO()
             }
