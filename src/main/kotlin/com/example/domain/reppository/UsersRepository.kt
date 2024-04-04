@@ -6,16 +6,17 @@ import com.example.data.repository.users.UsersDao
 import com.example.domain.model.Users
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class UsersRepository : UsersDao {
 
-    private fun rowToResult(row: ResultRow): Users?{
-        if (row == null){
+    private fun rowToResult(row: ResultRow): Users? {
+        if (row == null) {
             return null
-        }
-        else{
-           return Users(
+        } else {
+            return Users(
                 id = row[UserTable.id],
                 username = row[UserTable.username],
                 email = row[UserTable.email],
@@ -35,4 +36,11 @@ class UsersRepository : UsersDao {
         }
         return rowToResult(statement?.resultedValues?.get(0)!!)
     }
+
+    override suspend fun getAllUsers(): List<Users>? =
+        DatabaseFactory.dbQuery {
+            UserTable.selectAll().mapNotNull {
+                rowToResult(it)
+            }
+        }
 }
