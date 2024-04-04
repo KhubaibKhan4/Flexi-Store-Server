@@ -6,10 +6,11 @@ import com.example.data.repository.product.ProductDao
 import com.example.domain.model.product.Product
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
-class ProductRepository: ProductDao {
+class ProductRepository : ProductDao {
     override suspend fun insert(
         name: String,
         description: String,
@@ -31,7 +32,7 @@ class ProductRepository: ProductDao {
 
         var statement: InsertStatement<Number>? = null
         DatabaseFactory.dbQuery {
-            statement = ProductTable.insert {product ->
+            statement = ProductTable.insert { product ->
                 product[ProductTable.name] = name
                 product[ProductTable.description] = description
                 product[ProductTable.price] = price
@@ -63,7 +64,12 @@ class ProductRepository: ProductDao {
     }
 
     override suspend fun getProductById(id: Long): Product? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            ProductTable.select { ProductTable.id.eq(id) }
+                .map {
+                    rowToResult(it)
+                }.single()
+        }
     }
 
     override suspend fun deleteProductById(id: Long): Int? {
@@ -91,6 +97,7 @@ class ProductRepository: ProductDao {
     ): Int? {
         TODO("Not yet implemented")
     }
+
     private fun rowToResult(row: ResultRow): Product? {
         return if (row == null) {
             null
