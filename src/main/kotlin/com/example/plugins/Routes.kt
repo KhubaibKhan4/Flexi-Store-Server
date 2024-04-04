@@ -149,9 +149,29 @@ fun Route.users(
             text = "password Missing",
             status = HttpStatusCode.BadRequest
         )
+        val fullName = parameters["fullName"] ?: return@put call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val address = parameters["address"] ?: return@put call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val city = parameters["city"] ?: return@put call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val country = parameters["country"] ?: return@put call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val phoneNumber = parameters["phoneNumber"] ?: return@put call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
         try {
             val result = id.toLong().let { userId ->
-                db.updateUsers(userId, username, email, password)
+                db.updateUsers(userId, username, email, password,fullName,address,city,country,phoneNumber)
             }
             if (result == 1) {
                 call.respondText(
