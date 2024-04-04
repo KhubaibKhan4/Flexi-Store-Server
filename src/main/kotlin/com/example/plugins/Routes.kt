@@ -3,10 +3,14 @@ package com.example.plugins
 import com.example.domain.reppository.category.CategoryRepository
 import com.example.domain.reppository.user.UsersRepository
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import java.nio.file.Files
+import java.nio.file.Paths
 
 fun Route.users(
     db: UsersRepository
@@ -199,7 +203,7 @@ fun Route.users(
 fun Route.category(
     db: CategoryRepository
 ) {
-    post("v1/categories") {
+    /*post("v1/categories") {
         val parameters = call.receive<Parameters>()
         val name = parameters["name"] ?: return@post call.respondText(
             text = "Name Missing",
@@ -233,14 +237,82 @@ fun Route.category(
                 "Error While Uploading Category To Server : ${e.message}"
             )
         }
+    }*/
+    post("v1/categories") {
+        val multipart = call.receiveMultipart()
+        var name: String? = null
+        var description: String? = null
+        var isVisible: Boolean? = null
+        var imageUrl: String? = null
+
+        multipart.forEachPart { part ->
+            when (part) {
+                is PartData.FormItem -> {
+                    when (part.name) {
+                        "name" -> name = part.value
+                        "description" -> description = part.value
+                        "isVisible" -> isVisible = part.value.toBoolean()
+                    }
+                }
+
+                is PartData.FileItem -> {
+                    val fileBytes = part.streamProvider().readBytes()
+                    val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
+                    val directoryPath = Paths.get("/var/www/uploads/")
+                    if (!Files.exists(directoryPath)) {
+                        Files.createDirectories(directoryPath)
+                    }
+                    val filePath = "$directoryPath/$fileName"
+                    Files.write(Paths.get(filePath), fileBytes)
+                    imageUrl = "/uploads/categories/${fileName.replace(" ", "_")}"
+                }
+
+                is PartData.BinaryChannelItem -> TODO()
+                is PartData.BinaryItem -> TODO()
+            }
+            part.dispose()
+        }
+
+        name ?: return@post call.respond(
+            status = HttpStatusCode.BadRequest,
+            "Name Missing"
+        )
+        description ?: return@post call.respond(
+            status = HttpStatusCode.BadRequest,
+            "Description Missing"
+        )
+        isVisible ?: return@post call.respond(
+            status = HttpStatusCode.BadRequest,
+            "isVisible Missing"
+        )
+        imageUrl ?: return@post call.respond(
+            status = HttpStatusCode.BadRequest,
+            "ImageUrl Missing"
+        )
+
+        try {
+            val category = db.insert(name!!, description!!, isVisible!!, imageUrl!!)
+            category?.id.let { categoryId ->
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "Category Uploaded Successfully to Server : $category"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Uploading Category To Server : ${e.message}"
+            )
+        }
     }
+
     get("v1/categories") {
         try {
             val category = db.getAllCategories()
-            if (category?.isNotEmpty()== true){
+            if (category?.isNotEmpty() == true) {
                 call.respond(HttpStatusCode.OK, category)
-            }else{
-                call.respond(HttpStatusCode.BadRequest,"No Categories Found...")
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "No Categories Found...")
             }
 
         } catch (e: Exception) {
