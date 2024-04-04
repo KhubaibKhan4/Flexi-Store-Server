@@ -7,10 +7,15 @@ interface UsersDao {
         username: String,
         email: String,
         password: String,
+        address: String,
+        city: String,
+        country: String,
+        phone: String,
+        userRole: String
     ): Users?
 
     suspend fun getAllUsers(): List<Users>?
     suspend fun getUserById(id: Long): Users?
     suspend fun deleteUserById(id: Long): Int
-    suspend fun updateUsers(id: Long,username: String,email: String,password: String): Int
+    suspend fun updateUsers(id: Long, username: String, email: String, password: String): Int
 }
