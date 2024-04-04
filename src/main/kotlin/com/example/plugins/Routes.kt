@@ -447,15 +447,16 @@ fun Route.products(
             when (partData) {
                 is PartData.FileItem -> {
                     val fileName = partData.originalFileName ?: "image${System.currentTimeMillis()}"
-                    val file = File("/upload/products",fileName)
-                    partData.streamProvider().use {input ->
-                        file.outputStream().buffered().use {output ->
+                    val file = File("/upload/products", fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
                             input.copyTo(output)
                         }
 
                     }
                     imageUrl = "/upload/products/$fileName"
                 }
+
                 is PartData.FormItem -> {
                     when (partData.name) {
                         "name" -> name = partData.value
@@ -475,6 +476,7 @@ fun Route.products(
                         "averageRating" -> averageRating = partData.value.toDoubleOrNull()
                     }
                 }
+
                 else -> {
 
                 }
@@ -485,17 +487,29 @@ fun Route.products(
                 name ?: return@post call.respondText("Name Missing", status = HttpStatusCode.BadRequest),
                 description ?: return@post call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
                 price ?: return@post call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
-                categoryId ?: return@post call.respondText("Category ID Missing or Invalid", status = HttpStatusCode.BadRequest),
-                categoryTitle ?: return@post call.respondText("Category Title Missing", status = HttpStatusCode.BadRequest),
+                categoryId ?: return@post call.respondText(
+                    "Category ID Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                categoryTitle ?: return@post call.respondText(
+                    "Category Title Missing",
+                    status = HttpStatusCode.BadRequest
+                ),
                 imageUrl ?: return@post call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
                 created_at ?: return@post call.respondText("Created At Missing", status = HttpStatusCode.BadRequest),
                 updated_at ?: return@post call.respondText("Updated At Missing", status = HttpStatusCode.BadRequest),
-                total_stack ?: return@post call.respondText("Total Stack Missing or Invalid", status = HttpStatusCode.BadRequest),
+                total_stack ?: return@post call.respondText(
+                    "Total Stack Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 brand ?: return@post call.respondText("Brand Missing", status = HttpStatusCode.BadRequest),
                 weight ?: return@post call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
                 dimensions ?: return@post call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
                 isAvailable ?: false,
-                discountPrice ?: return@post call.respondText("Discount Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                discountPrice ?: return@post call.respondText(
+                    "Discount Price Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 promotionDescription ?: "",
                 averageRating ?: 0.0
             )
@@ -506,53 +520,80 @@ fun Route.products(
                 )
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.InternalServerError,
                 "Error While Creating Product: ${e.message}"
             )
         }
     }
-    get("v1/products"){
+    get("v1/products") {
         try {
             val products = db.getAllProducts()
-            if (products?.isNotEmpty()==true){
-                call.respond(HttpStatusCode.OK,products)
-            }else{
+            if (products?.isNotEmpty() == true) {
+                call.respond(HttpStatusCode.OK, products)
+            } else {
                 call.respond(
                     HttpStatusCode.Unauthorized,
                     "No Products Found..."
                 )
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 "Error While Fetching Products ${e.message}"
             )
         }
     }
-    delete("v1/products/{id}"){
+
+    get("v1/products/{id}") {
+        val id = call.parameters["id"] ?: return@get call.respondText(
+            text = "No ID Found...",
+            status = HttpStatusCode.BadRequest
+        )
+        try {
+            val products = db.deleteProductById(id.toLong())
+            if (products == null) {
+                call.respond(HttpStatusCode.BadRequest, "No Products Found")
+            } else {
+                call.respond(
+                    HttpStatusCode.OK,
+                    products
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                "Error While Fetching Products ${e.message}"
+            )
+        }
+    }
+
+
+    delete("v1/products/{id}") {
         val id = call.parameters["id"] ?: return@delete call.respond(
             status = HttpStatusCode.BadRequest,
             message = "Invalid Id"
         )
         try {
             val products = db.deleteProductById(id.toLong())
-            if (products == 1){
+            if (products == 1) {
                 call.respond(
                     HttpStatusCode.OK,
                     "Product Deleted Successfully $$products"
                 )
-            }else{
+            } else {
                 call.respond(HttpStatusCode.BadRequest, "Id Not Found...")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 "Error While Deleting Products ${e.message}"
             )
         }
     }
+
 
 }
