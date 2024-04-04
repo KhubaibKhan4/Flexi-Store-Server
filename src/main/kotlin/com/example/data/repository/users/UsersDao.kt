@@ -10,4 +10,5 @@ interface UsersDao {
     ): Users?
 
     suspend fun getAllUsers(): List<Users>?
+    suspend fun getUserById(id: Long): Users?
 }
