@@ -9,6 +9,7 @@ data class Product(
     val description: String,
     val price: Long,
     val categoryId: Long,
+    val categoryTitle: String,
     val imageUrl: String,
     val created_at: String,
     val updated_at: String,
