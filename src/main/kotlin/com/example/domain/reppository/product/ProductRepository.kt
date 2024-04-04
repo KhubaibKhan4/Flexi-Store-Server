@@ -96,7 +96,26 @@ class ProductRepository : ProductDao {
         promotionDescription: String,
         averageRating: Double
     ): Int? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            ProductTable.update({ProductTable.id.eq(id)}){product->
+                product[ProductTable.name] = name
+                product[ProductTable.description] = description
+                product[ProductTable.price] = price
+                product[ProductTable.categoryId] = categoryId
+                product[ProductTable.categoryTitle] = categoryTitle
+                product[ProductTable.imageUrl] = imageUrl
+                product[ProductTable.created_at] = created_at
+                product[ProductTable.updated_at] = updated_at
+                product[ProductTable.total_stack] = total_stack
+                product[ProductTable.brand] = brand
+                product[ProductTable.weight] = weight
+                product[ProductTable.dimensions] = dimensions
+                product[ProductTable.isAvailable] = isAvailable
+                product[ProductTable.discountPrice] = discountPrice
+                product[ProductTable.promotionDescription] = promotionDescription
+                product[ProductTable.averageRating] = averageRating
+            }
+        }
     }
 
     private fun rowToResult(row: ResultRow): Product? {
