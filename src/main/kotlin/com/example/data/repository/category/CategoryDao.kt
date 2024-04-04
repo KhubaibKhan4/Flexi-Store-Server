@@ -1,6 +1,8 @@
 package com.example.data.repository.category
 
-interface Category {
+import com.example.domain.model.category.Category
+
+interface CategoryDao {
     suspend fun insert(
         name: String,
         description: String,
