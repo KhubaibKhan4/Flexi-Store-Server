@@ -237,17 +237,12 @@ fun Route.category(
     get("v1/categories") {
         try {
             val category = db.getAllCategories()
-            if (category == null) {
-                call.respond(
-                    HttpStatusCode.OK,
-                    "No Users Found"
-                )
-            } else {
-                call.respond(
-                    HttpStatusCode.OK,
-                    category
-                )
+            if (category?.isNotEmpty()== true){
+                call.respond(HttpStatusCode.OK, category)
+            }else{
+                call.respond(HttpStatusCode.BadRequest,"No Categories Found...")
             }
+
         } catch (e: Exception) {
             call.respond(
                 HttpStatusCode.Unauthorized,
