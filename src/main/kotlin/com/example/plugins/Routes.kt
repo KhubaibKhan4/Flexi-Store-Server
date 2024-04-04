@@ -255,4 +255,38 @@ fun Route.category(
             )
         }
     }
+    get ("v1/categories/{id}"){
+        val id = call.parameters["id"] ?: return@get call.respond(
+            HttpStatusCode.BadRequest,
+            "Id is Missing"
+        )
+        try {
+            val categoryId = id.toLong()
+            if (categoryId == null){
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    "Category Id Invalid"
+                )
+            }
+            val categories = db.getCategoryById(categoryId)
+            if (categories== null){
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    "No Category Found..."
+                )
+            }else{
+                call.respond(
+                    HttpStatusCode.OK,
+                    categories
+                )
+            }
+
+
+        }catch (e: Exception){
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Fetching Categories ${e.message}"
+            )
+        }
+    }
 }
