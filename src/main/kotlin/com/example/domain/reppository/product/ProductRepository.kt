@@ -1,9 +1,12 @@
 package com.example.domain.reppository.product
 
+import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.product.ProductTable
 import com.example.data.repository.product.ProductDao
 import com.example.domain.model.product.Product
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class ProductRepository: ProductDao {
     override suspend fun insert(
@@ -24,7 +27,29 @@ class ProductRepository: ProductDao {
         promotionDescription: String,
         averageRating: Double
     ): Product? {
-        TODO("Not yet implemented")
+
+        var statement: InsertStatement<Number>? = null
+        DatabaseFactory.dbQuery {
+            statement = ProductTable.insert {product ->
+                product[ProductTable.name] = name
+                product[ProductTable.description] = description
+                product[ProductTable.price] = price
+                product[ProductTable.categoryId] = categoryId
+                product[ProductTable.categoryTitle] = categoryTitle
+                product[ProductTable.imageUrl] = imageUrl
+                product[ProductTable.created_at] = created_at
+                product[ProductTable.updated_at] = updated_at
+                product[ProductTable.total_stack] = total_stack
+                product[ProductTable.brand] = brand
+                product[ProductTable.weight] = weight
+                product[ProductTable.dimensions] = dimensions
+                product[ProductTable.isAvailable] = isAvailable
+                product[ProductTable.discountPrice] = discountPrice
+                product[ProductTable.promotionDescription] = promotionDescription
+                product[ProductTable.averageRating] = averageRating
+            }
+        }
+        return rowToResult(statement?.resultedValues?.get(0)!!)
     }
 
     override suspend fun getAllProducts(): List<Product>? {
