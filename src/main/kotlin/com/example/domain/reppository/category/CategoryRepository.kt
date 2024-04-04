@@ -5,11 +5,8 @@ import com.example.data.local.table.category.CategoryTable
 import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.repository.category.CategoryDao
 import com.example.domain.model.category.Category
-import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class CategoryRepository : CategoryDao {
@@ -45,7 +42,9 @@ class CategoryRepository : CategoryDao {
     }
 
     override suspend fun deleteCategoryById(id: Long): Int? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            CategoryTable.deleteWhere { CategoryTable.id.eq(id) }
+        }
     }
 
     override suspend fun updateCategoryById(
