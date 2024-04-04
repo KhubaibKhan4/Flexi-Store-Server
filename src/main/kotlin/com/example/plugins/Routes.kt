@@ -1,5 +1,6 @@
 package com.example.plugins
 
+import com.example.domain.reppository.category.CategoryRepository
 import com.example.domain.reppository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -171,7 +172,7 @@ fun Route.users(
         )
         try {
             val result = id.toLong().let { userId ->
-                db.updateUsers(userId, username, email, password,fullName,address,city,country,phoneNumber)
+                db.updateUsers(userId, username, email, password, fullName, address, city, country, phoneNumber)
             }
             if (result == 1) {
                 call.respondText(
@@ -193,4 +194,44 @@ fun Route.users(
         }
     }
 
+}
+
+fun Route.category(
+    db: CategoryRepository
+) {
+    post("v1/category") {
+        val parameters = call.receive<Parameters>()
+        val name = parameters["name"] ?: return@post call.respondText(
+            text = "Name Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val description = parameters["description"] ?: return@post call.respondText(
+            text = "Description Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val isVisible = parameters["isVisible"] ?: return@post call.respondText(
+            text = "isVisible Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val imageUrl = parameters["imageUrl"] ?: return@post call.respondText(
+            text = "ImageUrl Missing",
+            status = HttpStatusCode.BadRequest
+        )
+
+        try {
+            val category = db.insert(name, description, isVisible.toBoolean(), imageUrl)
+            category?.id.let { categoryId ->
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "Category Data Uploaded Successfully $category"
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Uploading Category To Server : ${e.message}"
+            )
+        }
+    }
 }
