@@ -255,26 +255,26 @@ fun Route.category(
             )
         }
     }
-    get ("v1/categories/{id}"){
+    get("v1/categories/{id}") {
         val id = call.parameters["id"] ?: return@get call.respond(
             HttpStatusCode.BadRequest,
             "Id is Missing"
         )
         try {
             val categoryId = id.toLong()
-            if (categoryId == null){
+            if (categoryId == null) {
                 call.respond(
                     HttpStatusCode.Unauthorized,
                     "Category Id Invalid"
                 )
             }
             val categories = db.getCategoryById(categoryId)
-            if (categories== null){
+            if (categories == null) {
                 call.respond(
                     HttpStatusCode.BadRequest,
                     "No Category Found..."
                 )
-            }else{
+            } else {
                 call.respond(
                     HttpStatusCode.OK,
                     categories
@@ -282,29 +282,72 @@ fun Route.category(
             }
 
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 HttpStatusCode.Unauthorized,
                 "Error While Fetching Categories ${e.message}"
             )
         }
     }
-    delete("v1/categories/{id}"){
+    delete("v1/categories/{id}") {
         val id = call.parameters["id"] ?: return@delete call.respond(
             HttpStatusCode.BadRequest,
             "Id Missing"
         )
         try {
             val categories = db.deleteCategoryById(id.toLong())
-            if (categories == 1){
+            if (categories == 1) {
                 call.respond(HttpStatusCode.OK, "Category Deleted Successfully $categories")
-            }else{
-                call.respond(HttpStatusCode.BadRequest,"Id Not Found...")
+            } else {
+                call.respond(HttpStatusCode.BadRequest, "Id Not Found...")
             }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 HttpStatusCode.Unauthorized,
                 "Error While Fetching Categories.. ${e.message}"
+            )
+        }
+    }
+
+    put("v1/categories/{id}") {
+        val id = call.parameters["id"]?.toLong() ?: return@put call.respondText(
+            text = "Invalid Id",
+            status = HttpStatusCode.BadRequest
+        )
+        val parameters = call.receive<Parameters>()
+        val name = parameters["name"] ?: return@put call.respondText(
+            text = "Invalid Name",
+            status = HttpStatusCode.BadRequest
+        )
+        val description = parameters["description"] ?: return@put call.respondText(
+            text = "Description Invalid",
+            status = HttpStatusCode.BadRequest
+        )
+        val isVisible = parameters["isVisible"] ?: return@put call.respondText(
+            text = "isVisible Invalid",
+            status = HttpStatusCode.BadRequest
+        )
+        val imageUrl = parameters["imageUrl"] ?: return@put call.respondText(
+            text = "ImageUrl Invalid",
+            status = HttpStatusCode.BadRequest
+        )
+        try {
+            val result = id.let { categoryId ->
+                db.updateCategoryById(categoryId, name, description, isVisible.toBoolean(), imageUrl)
+            }
+            if (result == 1) {
+                call.respond(HttpStatusCode.OK, "Update Successfully $result")
+            } else {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Something Went Wrong..."
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.Unauthorized,
+                "Error While Updating Data to Server : ${e.message}"
             )
         }
     }
