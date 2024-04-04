@@ -21,4 +21,5 @@ interface ProductDao {
         promotionDescription: String,
         averageRating: Double,
     ): Product?
+    suspend fun getAllProducts(): List<Product>?
 }
