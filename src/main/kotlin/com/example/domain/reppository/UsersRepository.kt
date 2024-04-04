@@ -43,4 +43,13 @@ class UsersRepository : UsersDao {
                 rowToResult(it)
             }
         }
+
+    override suspend fun getUserById(id: Long): Users? =
+        DatabaseFactory.dbQuery {
+            UserTable.select { UserTable.id.eq(id) }
+                .map {
+                    rowToResult(it)
+                }.singleOrNull()
+        }
+
 }
