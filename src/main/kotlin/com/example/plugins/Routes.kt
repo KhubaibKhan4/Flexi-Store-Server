@@ -595,5 +595,106 @@ fun Route.products(
         }
     }
 
+    put("v1/products/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@put call.respondText(
+            text = "Invalid or Missing Product ID",
+            status = HttpStatusCode.BadRequest
+        )
+        val multipart = call.receiveMultipart()
+
+        var name: String? = null
+        var description: String? = null
+        var price: Long? = null
+        var categoryId: Long? = null
+        var categoryTitle: String? = null
+        var imageUrl: String? = null
+        var created_at: String? = null
+        var updated_at: String? = null
+        var total_stack: Long? = null
+        var brand: String? = null
+        var weight: Double? = null
+        var dimensions: String? = null
+        var isAvailable: Boolean? = null
+        var discountPrice: Long? = null
+        var promotionDescription: String? = null
+        var averageRating: Double? = null
+
+        multipart.forEachPart { partData ->
+            when (partData) {
+                is PartData.FileItem -> {
+                    val fileName = partData.originalFileName ?: "image_${System.currentTimeMillis()}"
+                    val file = File("/upload/products", fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    imageUrl = "/upload/products/$fileName"
+                }
+                is PartData.FormItem -> {
+                    when (partData.name) {
+                        "name" -> name = partData.value
+                        "description" -> description = partData.value
+                        "price" -> price = partData.value.toLongOrNull()
+                        "categoryId" -> categoryId = partData.value.toLongOrNull()
+                        "categoryTitle" -> categoryTitle = partData.value
+                        "created_at" -> created_at = partData.value
+                        "updated_at" -> updated_at = partData.value
+                        "total_stack" -> total_stack = partData.value.toLongOrNull()
+                        "brand" -> brand = partData.value
+                        "weight" -> weight = partData.value.toDoubleOrNull()
+                        "dimensions" -> dimensions = partData.value
+                        "isAvailable" -> isAvailable = partData.value.toBoolean()
+                        "discountPrice" -> discountPrice = partData.value.toLongOrNull()
+                        "promotionDescription" -> promotionDescription = partData.value
+                        "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
+        try {
+            val result = db.updateProductById(
+                id,
+                name ?: return@put call.respondText("Name Missing", status = HttpStatusCode.BadRequest),
+                description ?: return@put call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
+                price ?: return@put call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                categoryId ?: return@put call.respondText("Category ID Missing or Invalid", status = HttpStatusCode.BadRequest),
+                categoryTitle ?: return@put call.respondText("Category Title Missing", status = HttpStatusCode.BadRequest),
+                imageUrl ?: return@put call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
+                created_at ?: return@put call.respondText("Created At Missing", status = HttpStatusCode.BadRequest),
+                updated_at ?: return@put call.respondText("Updated At Missing", status = HttpStatusCode.BadRequest),
+                total_stack ?: return@put call.respondText("Total Stack Missing or Invalid", status = HttpStatusCode.BadRequest),
+                brand ?: return@put call.respondText("Brand Missing", status = HttpStatusCode.BadRequest),
+                weight ?: return@put call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
+                dimensions ?: return@put call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
+                isAvailable ?: false,
+                discountPrice ?: return@put call.respondText("Discount Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                promotionDescription ?: "",
+                averageRating ?: 0.0
+            )
+
+            if (result != null && result > 0) {
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "Product Updated Successfully"
+                )
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Product with ID $id not found"
+                )
+            }
+
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                "Error While Updating Products ${e.message}"
+            )
+        }
+
+    }
 
 }
