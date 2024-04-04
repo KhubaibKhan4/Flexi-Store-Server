@@ -4,6 +4,7 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.user.UserTable
 import com.example.data.repository.users.UsersDao
 import com.example.domain.model.user.Users
+import org.h2.engine.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
@@ -18,18 +19,40 @@ class UsersRepository : UsersDao {
                 id = row[UserTable.id],
                 username = row[UserTable.username],
                 email = row[UserTable.email],
-                password = row[UserTable.password]
+                password = row[UserTable.password],
+                fullName = row[UserTable.fullName],
+                address = row[UserTable.address],
+                city = row[UserTable.city],
+                country = row[UserTable.country],
+                phoneNumber = row[UserTable.phoneNumber],
+                userRole = row[UserTable.userRole]
             )
         }
     }
 
-    override suspend fun insert(username: String, email: String, password: String): Users? {
+
+    override suspend fun insert(
+        username: String,
+        email: String,
+        password: String,
+        fullName: String,
+        address: String,
+        city: String,
+        country: String,
+        phone: String,
+        userRole: String
+    ): Users? {
         var statement: InsertStatement<Number>? = null
         DatabaseFactory.dbQuery {
             statement = UserTable.insert { users ->
                 users[UserTable.username] = username
                 users[UserTable.email] = email
                 users[UserTable.password] = password
+                users[UserTable.fullName] = fullName
+                users[UserTable.address] = address
+                users[UserTable.city] = city
+                users[UserTable.country] = country
+                users[UserTable.userRole] = userRole
             }
         }
         return rowToResult(statement?.resultedValues?.get(0)!!)

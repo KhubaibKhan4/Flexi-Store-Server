@@ -7,6 +7,7 @@ interface UsersDao {
         username: String,
         email: String,
         password: String,
+        fullName: String,
         address: String,
         city: String,
         country: String,
