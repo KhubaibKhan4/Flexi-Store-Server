@@ -532,5 +532,27 @@ fun Route.products(
             )
         }
     }
+    delete("v1/products/{id}"){
+        val id = call.parameters["id"] ?: return@delete call.respond(
+            status = HttpStatusCode.BadRequest,
+            message = "Invalid Id"
+        )
+        try {
+            val products = db.deleteProductById(id.toLong())
+            if (products == 1){
+                call.respond(
+                    HttpStatusCode.OK,
+                    "Product Deleted Successfully $$products"
+                )
+            }else{
+                call.respond(HttpStatusCode.BadRequest, "Id Not Found...")
+            }
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                "Error While Deleting Products ${e.message}"
+            )
+        }
+    }
 
 }
