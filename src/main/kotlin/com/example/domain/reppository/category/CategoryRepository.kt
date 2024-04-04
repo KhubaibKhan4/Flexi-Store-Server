@@ -54,7 +54,15 @@ class CategoryRepository : CategoryDao {
         isVisible: Boolean,
         imageUrl: String
     ): Int? {
-        TODO("Not yet implemented")
+       return DatabaseFactory.dbQuery {
+           CategoryTable.update({CategoryTable.id.eq(id)}){category ->
+               category[CategoryTable.id]= id
+               category[CategoryTable.name] = name
+               category[CategoryTable.description]= description
+               category[CategoryTable.isVisible] = isVisible
+               category[CategoryTable.imageUrl]= imageUrl
+           }
+       }
     }
 
     private fun rowToResult(row: ResultRow): Category? {
