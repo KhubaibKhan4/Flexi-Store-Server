@@ -22,4 +22,5 @@ interface ProductDao {
         averageRating: Double,
     ): Product?
     suspend fun getAllProducts(): List<Product>?
+    suspend fun getProductById(id: Long): Product?
 }
