@@ -6,6 +6,7 @@ import com.example.data.repository.product.ProductDao
 import com.example.domain.model.product.Product
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class ProductRepository: ProductDao {
@@ -53,7 +54,12 @@ class ProductRepository: ProductDao {
     }
 
     override suspend fun getAllProducts(): List<Product>? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            ProductTable.selectAll()
+                .mapNotNull {
+                    rowToResult(it)
+                }
+        }
     }
 
     override suspend fun getProductById(id: Long): Product? {
