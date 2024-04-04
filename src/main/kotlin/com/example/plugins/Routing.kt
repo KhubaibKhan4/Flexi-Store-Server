@@ -1,7 +1,7 @@
 package com.example.plugins
 
-import com.example.data.local.DatabaseFactory
-import com.example.domain.reppository.UsersRepository
+import com.example.data.local.table.db.DatabaseFactory
+import com.example.domain.reppository.user.UsersRepository
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

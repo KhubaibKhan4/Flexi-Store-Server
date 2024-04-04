@@ -1,6 +1,6 @@
-package com.example.data.local
+package com.example.data.local.table.db
 
-import com.example.data.local.table.UserTable
+import com.example.data.local.table.user.UserTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.Dispatchers

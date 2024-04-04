@@ -1,6 +1,6 @@
 package com.example.data.repository.users
 
-import com.example.domain.model.Users
+import com.example.domain.model.user.Users
 
 interface UsersDao {
     suspend fun insert(

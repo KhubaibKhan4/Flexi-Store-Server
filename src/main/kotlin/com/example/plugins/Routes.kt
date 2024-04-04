@@ -1,6 +1,6 @@
 package com.example.plugins
 
-import com.example.domain.reppository.UsersRepository
+import com.example.domain.reppository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

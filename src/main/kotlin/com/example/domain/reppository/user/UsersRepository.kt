@@ -1,9 +1,9 @@
-package com.example.domain.reppository
+package com.example.domain.reppository.user
 
-import com.example.data.local.DatabaseFactory
-import com.example.data.local.table.UserTable
+import com.example.data.local.table.db.DatabaseFactory
+import com.example.data.local.table.user.UserTable
 import com.example.data.repository.users.UsersDao
-import com.example.domain.model.Users
+import com.example.domain.model.user.Users
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
