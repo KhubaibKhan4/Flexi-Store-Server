@@ -289,4 +289,23 @@ fun Route.category(
             )
         }
     }
+    delete("v1/categories/{id}"){
+        val id = call.parameters["id"] ?: return@delete call.respond(
+            HttpStatusCode.BadRequest,
+            "Id Missing"
+        )
+        try {
+            val categories = db.deleteCategoryById(id.toLong())
+            if (categories == 1){
+                call.respond(HttpStatusCode.OK, "Category Deleted Successfully $categories")
+            }else{
+                call.respond(HttpStatusCode.BadRequest,"Id Not Found...")
+            }
+        }catch (e: Exception){
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Fetching Categories.. ${e.message}"
+            )
+        }
+    }
 }
