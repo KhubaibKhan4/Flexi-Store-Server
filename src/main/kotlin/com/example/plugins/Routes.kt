@@ -107,5 +107,46 @@ fun Route.users(
             )
         }
     }
+    put("v1/users/{id}") {
+        val id = call.parameters["id"] ?: return@put call.respondText(
+            text = "Id Not Found",
+            status = HttpStatusCode.NotFound
+        )
+        val parameters = call.receive<Parameters>()
+        val username = parameters["username"] ?: return@put call.respondText(
+            text = "Username Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val email = parameters["email"] ?: return@put call.respondText(
+            text = "email Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val password = parameters["password"] ?: return@put call.respondText(
+            text = "password Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        try {
+            val result = id.toLong().let { userId ->
+                db.updateUsers(userId, username, email, password)
+            }
+            if (result == 1) {
+                call.respondText(
+                    text = "Update Successfully...",
+                    status = HttpStatusCode.OK
+                )
+            } else {
+                call.respondText(
+                    "Something Went Wrong...",
+                    status = HttpStatusCode.BadRequest
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respondText(
+                text = e.message.toString(),
+                status = HttpStatusCode.BadRequest
+            )
+        }
+    }
 
 }
