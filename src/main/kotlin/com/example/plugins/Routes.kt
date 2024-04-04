@@ -24,6 +24,10 @@ fun Route.users(
             text = "Password Missing",
             status = HttpStatusCode.Unauthorized
         )
+        val fullName = parameters["fullName"] ?: return@post call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.Unauthorized
+        )
         val address = parameters["address"] ?: return@post call.respondText(
             text = "Address Missing",
             status = HttpStatusCode.Unauthorized
@@ -36,12 +40,16 @@ fun Route.users(
             text = "Country Missing",
             status = HttpStatusCode.Unauthorized
         )
+        val phoneNumber = parameters["phoneNumber"] ?: return@post call.respondText(
+            text = "phoneNumber Missing",
+            status = HttpStatusCode.Unauthorized
+        )
         val userRole = parameters["country"] ?: return@post call.respondText(
             text = "User Role Missing",
             status = HttpStatusCode.Unauthorized
         )
         try {
-            val users = db.insert(userName, email, password)
+            val users = db.insert(userName, email, password, fullName, address, city, country, phoneNumber, userRole)
             users?.id.let {
                 call.respond(
                     status = HttpStatusCode.OK,
