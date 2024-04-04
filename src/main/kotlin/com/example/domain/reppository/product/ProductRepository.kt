@@ -4,11 +4,10 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.product.ProductTable
 import com.example.data.repository.product.ProductDao
 import com.example.domain.model.product.Product
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import javax.xml.crypto.Data
 
 class ProductRepository : ProductDao {
     override suspend fun insert(
@@ -73,7 +72,9 @@ class ProductRepository : ProductDao {
     }
 
     override suspend fun deleteProductById(id: Long): Int? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            ProductTable.deleteWhere { ProductTable.id.eq(id) }
+        }
     }
 
     override suspend fun updateProductById(
