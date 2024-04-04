@@ -80,5 +80,32 @@ fun Route.users(
         }
 
     }
+    delete("v1/users/{id}") {
+        val parameters = call.parameters["id"]
+        try {
+            val users = parameters?.toLongOrNull()?.let { usersId ->
+                db.deleteUserById(usersId)
+            } ?: return@delete call.respondText(
+                text = "No Id Found",
+                status = HttpStatusCode.BadRequest
+            )
+            if (users == 1) {
+                call.respondText(
+                    text = "Deleted Successfully",
+                    status = HttpStatusCode.OK
+                )
+            } else {
+                call.respondText(
+                    text = "Id Not Found",
+                    status = HttpStatusCode.BadRequest
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Deleting User From Server ${e.message}"
+            )
+        }
+    }
 
 }
