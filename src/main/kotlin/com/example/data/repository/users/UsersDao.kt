@@ -8,4 +8,6 @@ interface UsersDao {
         email: String,
         password: String,
     ): Users?
+
+    suspend fun getAllUsers(): List<Users>?
 }
