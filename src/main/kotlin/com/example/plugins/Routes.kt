@@ -381,29 +381,63 @@ fun Route.category(
             text = "Invalid Id",
             status = HttpStatusCode.BadRequest
         )
-        val parameters = call.receive<Parameters>()
-        val name = parameters["name"] ?: return@put call.respondText(
-            text = "Invalid Name",
-            status = HttpStatusCode.BadRequest
-        )
-        val description = parameters["description"] ?: return@put call.respondText(
-            text = "Description Invalid",
-            status = HttpStatusCode.BadRequest
-        )
-        val isVisible = parameters["isVisible"] ?: return@put call.respondText(
-            text = "isVisible Invalid",
-            status = HttpStatusCode.BadRequest
-        )
-        val imageUrl = parameters["imageUrl"] ?: return@put call.respondText(
-            text = "ImageUrl Invalid",
-            status = HttpStatusCode.BadRequest
-        )
-        try {
-            val result = id.let { categoryId ->
-                db.updateCategoryById(categoryId, name, description, isVisible.toBoolean(), imageUrl)
+
+        val multipart = call.receiveMultipart()
+        var name: String? = null
+        var description: String? = null
+        var isVisible: Boolean? = null
+        var imageUrl: String? = null
+
+        multipart.forEachPart { part ->
+            when (part) {
+                is PartData.FormItem -> {
+                    when (part.name) {
+                        "name" -> name = part.value
+                        "description" -> description = part.value
+                        "isVisible" -> isVisible = part.value.toBoolean()
+                    }
+                }
+                is PartData.FileItem -> {
+                    val fileBytes = part.streamProvider().readBytes()
+                    val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
+                    val directoryPath = Paths.get("/var/www/uploads/") // Adjust the directory path as needed
+
+                    // Create the directory if it doesn't exist
+                    if (!Files.exists(directoryPath)) {
+                        Files.createDirectories(directoryPath)
+                    }
+
+                    val filePath = "$directoryPath/$fileName"
+                    Files.write(Paths.get(filePath), fileBytes)
+                    imageUrl = "/uploads/categories/${fileName.replace(" ", "_")}"
+                }
+                is PartData.BinaryChannelItem -> TODO()
+                is PartData.BinaryItem -> TODO()
             }
+            part.dispose()
+        }
+
+        name ?: return@put call.respond(
+            status = HttpStatusCode.BadRequest,
+            "Name Missing"
+        )
+        description ?: return@put call.respond(
+            status = HttpStatusCode.BadRequest,
+            "Description Missing"
+        )
+        isVisible ?: return@put call.respond(
+            status = HttpStatusCode.BadRequest,
+            "isVisible Missing"
+        )
+        imageUrl ?: return@put call.respond(
+            status = HttpStatusCode.BadRequest,
+            "ImageUrl Missing"
+        )
+
+        try {
+            val result = db.updateCategoryById(id, name!!, description!!, isVisible!!, imageUrl!!)
             if (result == 1) {
-                call.respond(HttpStatusCode.OK, "Update Successfully $result")
+                call.respond(HttpStatusCode.OK, "Update Successfully")
             } else {
                 call.respond(
                     HttpStatusCode.BadRequest,
