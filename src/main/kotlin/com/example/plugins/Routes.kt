@@ -5,9 +5,11 @@ import com.example.domain.reppository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -222,17 +224,16 @@ fun Route.category(
                 is PartData.FileItem -> {
                     val fileBytes = part.streamProvider().readBytes()
                     val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
-                    val directoryPath = Paths.get("/var/www/uploads/")
-                    if (!Files.exists(directoryPath)) {
-                        Files.createDirectories(directoryPath)
+                    val directoryPath = File("/var/www/uploads")
+                    if (!directoryPath.exists()) {
+                        directoryPath.mkdirs()
                     }
                     val filePath = "$directoryPath/$fileName"
-                    Files.write(Paths.get(filePath), fileBytes)
-                    imageUrl = "/uploads/categories/${fileName.replace(" ", "_")}"
+                    File(filePath).writeBytes(fileBytes)
+                    imageUrl = "/uploads/${fileName.replace(" ","_")}"
                 }
 
-                is PartData.BinaryChannelItem -> TODO()
-                is PartData.BinaryItem -> TODO()
+                else -> { }
             }
             part.dispose()
         }
