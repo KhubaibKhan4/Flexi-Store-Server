@@ -513,5 +513,24 @@ fun Route.products(
             )
         }
     }
+    get("v1/products"){
+        try {
+            val products = db.getAllProducts()
+            if (products?.isNotEmpty()==true){
+                call.respond(HttpStatusCode.OK,products)
+            }else{
+                call.respond(
+                    HttpStatusCode.Unauthorized,
+                    "No Products Found..."
+                )
+            }
+
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.BadRequest,
+                "Error While Fetching Products ${e.message}"
+            )
+        }
+    }
 
 }
