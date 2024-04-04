@@ -44,7 +44,7 @@ fun Route.users(
             text = "phoneNumber Missing",
             status = HttpStatusCode.Unauthorized
         )
-        val userRole = parameters["country"] ?: return@post call.respondText(
+        val userRole = parameters["userRole"] ?: return@post call.respondText(
             text = "User Role Missing",
             status = HttpStatusCode.Unauthorized
         )

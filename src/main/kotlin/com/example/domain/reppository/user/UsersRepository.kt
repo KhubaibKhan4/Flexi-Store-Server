@@ -39,7 +39,7 @@ class UsersRepository : UsersDao {
         address: String,
         city: String,
         country: String,
-        phone: String,
+        phoneNumber: String,
         userRole: String
     ): Users? {
         var statement: InsertStatement<Number>? = null
@@ -52,6 +52,7 @@ class UsersRepository : UsersDao {
                 users[UserTable.address] = address
                 users[UserTable.city] = city
                 users[UserTable.country] = country
+                users[UserTable.phoneNumber]=phoneNumber
                 users[UserTable.userRole] = userRole
             }
         }
