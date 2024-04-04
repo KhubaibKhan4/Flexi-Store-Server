@@ -7,5 +7,11 @@ data class Users(
     val id: Long,
     val username: String,
     val email: String,
-    val password: String
+    val password: String,
+    val fullName: String,
+    val address: String,
+    val city: String,
+    val country: String,
+    val phoneNumber: String,
+    val userRole: String
 )
