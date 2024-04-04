@@ -199,7 +199,7 @@ fun Route.users(
 fun Route.category(
     db: CategoryRepository
 ) {
-    post("v1/category") {
+    post("v1/categories") {
         val parameters = call.receive<Parameters>()
         val name = parameters["name"] ?: return@post call.respondText(
             text = "Name Missing",
@@ -231,6 +231,27 @@ fun Route.category(
             call.respond(
                 HttpStatusCode.Unauthorized,
                 "Error While Uploading Category To Server : ${e.message}"
+            )
+        }
+    }
+    get("v1/categories") {
+        try {
+            val category = db.getAllCategories()
+            if (category == null) {
+                call.respond(
+                    HttpStatusCode.OK,
+                    "No Users Found"
+                )
+            } else {
+                call.respond(
+                    HttpStatusCode.OK,
+                    category
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Fetching  Data from Server ${e.message}"
             )
         }
     }
