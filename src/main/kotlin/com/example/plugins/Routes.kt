@@ -26,7 +26,7 @@ fun Route.users(
             status = HttpStatusCode.Unauthorized
         )
         try {
-            val users = db.insert(userName,email, password)
+            val users = db.insert(userName, email, password)
             users?.id.let {
                 call.respond(
                     status = HttpStatusCode.OK,
@@ -35,6 +35,19 @@ fun Route.users(
             }
         } catch (e: Exception) {
             call.respond(status = HttpStatusCode.Unauthorized, "Error While Upload Data to Server ${e.message}")
+        }
+    }
+    get("v1/users") {
+        try {
+            val users = db.getAllUsers()
+            if (users?.isNotEmpty() == true) {
+                call.respond(HttpStatusCode.OK, users)
+            }
+        } catch (e: Exception) {
+            call.respond(
+                HttpStatusCode.Unauthorized,
+                "Error While Fetching Data From Server: ${e.message}"
+            )
         }
     }
 
