@@ -1,11 +1,11 @@
 package com.example.plugins
 
 import com.example.domain.reppository.category.CategoryRepository
+import com.example.domain.reppository.product.ProductRepository
 import com.example.domain.reppository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
-import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -230,10 +230,10 @@ fun Route.category(
                     }
                     val filePath = "$directoryPath/$fileName"
                     File(filePath).writeBytes(fileBytes)
-                    imageUrl = "/uploads/${fileName.replace(" ","_")}"
+                    imageUrl = "/uploads/${fileName.replace(" ", "_")}"
                 }
 
-                else -> { }
+                else -> {}
             }
             part.dispose()
         }
@@ -419,4 +419,99 @@ fun Route.category(
             )
         }
     }
+}
+
+fun Route.products(
+    db: ProductRepository
+) {
+    post("v1/products") {
+        val multipart = call.receiveMultipart()
+        var name: String? = null
+        var description: String? = null
+        var price: Long? = null
+        var categoryId: Long? = null
+        var categoryTitle: String? = null
+        var imageUrl: String? = null
+        var created_at: String? = null
+        var updated_at: String? = null
+        var total_stack: Long? = null
+        var brand: String? = null
+        var weight: Double? = null
+        var dimensions: String? = null
+        var isAvailable: Boolean? = null
+        var discountPrice: Long? = null
+        var promotionDescription: String? = null
+        var averageRating: Double? = null
+
+        multipart.forEachPart { partData ->
+            when (partData) {
+                is PartData.FileItem -> {
+                    val fileName = partData.originalFileName ?: "image${System.currentTimeMillis()}"
+                    val file = File("/upload/products",fileName)
+                    partData.streamProvider().use {input ->
+                        file.outputStream().buffered().use {output ->
+                            input.copyTo(output)
+                        }
+
+                    }
+                    imageUrl = "/upload/products/$fileName"
+                }
+                is PartData.FormItem -> {
+                    when (partData.name) {
+                        "name" -> name = partData.value
+                        "description" -> description = partData.value
+                        "price" -> price = partData.value.toLong()
+                        "categoryId" -> categoryId = partData.value.toLongOrNull()
+                        "categoryTitle" -> categoryTitle = partData.value
+                        "created_at" -> created_at = partData.value
+                        "updated_at" -> updated_at = partData.value
+                        "total_stack" -> total_stack = partData.value.toLongOrNull()
+                        "brand" -> brand = partData.value
+                        "weight" -> weight = partData.value.toDoubleOrNull()
+                        "dimensions" -> dimensions = partData.value
+                        "isAvailable" -> isAvailable = partData.value.toBoolean()
+                        "discountPrice" -> discountPrice = partData.value.toLongOrNull()
+                        "promotionDescription" -> promotionDescription = partData.value
+                        "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                    }
+                }
+                else -> {
+
+                }
+            }
+        }
+        try {
+            val product = db.insert(
+                name ?: return@post call.respondText("Name Missing", status = HttpStatusCode.BadRequest),
+                description ?: return@post call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
+                price ?: return@post call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                categoryId ?: return@post call.respondText("Category ID Missing or Invalid", status = HttpStatusCode.BadRequest),
+                categoryTitle ?: return@post call.respondText("Category Title Missing", status = HttpStatusCode.BadRequest),
+                imageUrl ?: return@post call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
+                created_at ?: return@post call.respondText("Created At Missing", status = HttpStatusCode.BadRequest),
+                updated_at ?: return@post call.respondText("Updated At Missing", status = HttpStatusCode.BadRequest),
+                total_stack ?: return@post call.respondText("Total Stack Missing or Invalid", status = HttpStatusCode.BadRequest),
+                brand ?: return@post call.respondText("Brand Missing", status = HttpStatusCode.BadRequest),
+                weight ?: return@post call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
+                dimensions ?: return@post call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
+                isAvailable ?: false,
+                discountPrice ?: return@post call.respondText("Discount Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                promotionDescription ?: "",
+                averageRating ?: 0.0
+            )
+            product?.id?.let {
+                call.respond(
+                    status = HttpStatusCode.Created,
+                    "Product Created Successfully: $product"
+                )
+            }
+
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Creating Product: ${e.message}"
+            )
+        }
+    }
+
 }
