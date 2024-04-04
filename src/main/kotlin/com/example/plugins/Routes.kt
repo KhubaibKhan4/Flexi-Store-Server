@@ -1,6 +1,5 @@
 package com.example.plugins
 
-import com.example.domain.model.Users
 import com.example.domain.reppository.UsersRepository
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -49,6 +48,37 @@ fun Route.users(
                 "Error While Fetching Data From Server: ${e.message}"
             )
         }
+    }
+    get("v1/users/{id}") {
+        val parameters = call.parameters["id"]
+        try {
+            val usersId = parameters?.toLong()
+            if (usersId == null) {
+                return@get call.respondText(
+                    "Invalid ID",
+                    status = HttpStatusCode.BadRequest
+                )
+            }
+            val user = db.getUserById(usersId)
+            if (user == null) {
+                return@get call.respondText(
+                    text = "User Not Found",
+                    status = HttpStatusCode.NotFound
+                )
+            } else {
+                return@get call.respond(
+                    HttpStatusCode.OK,
+                    user
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.Unauthorized,
+                "Error While Fetching Data from Server : ${e.message}"
+            )
+        }
+
     }
 
 }
