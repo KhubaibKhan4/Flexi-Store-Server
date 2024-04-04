@@ -52,7 +52,7 @@ class UsersRepository : UsersDao {
                 users[UserTable.address] = address
                 users[UserTable.city] = city
                 users[UserTable.country] = country
-                users[UserTable.phoneNumber]=phoneNumber
+                users[UserTable.phoneNumber] = phoneNumber
                 users[UserTable.userRole] = userRole
             }
         }
@@ -79,13 +79,28 @@ class UsersRepository : UsersDao {
             UserTable.deleteWhere { UserTable.id.eq(id) }
         }
 
-    override suspend fun updateUsers(id: Long, username: String, email: String, password: String): Int =
+    override suspend fun updateUsers(
+        id: Long,
+        username: String,
+        email: String,
+        password: String,
+        fullName: String,
+        address: String,
+        city: String,
+        country: String,
+        phoneNumber: String
+    ): Int =
         DatabaseFactory.dbQuery {
             UserTable.update({ UserTable.id.eq(id) }) { user ->
                 user[UserTable.id] = id
                 user[UserTable.username] = username
                 user[UserTable.email] = email
                 user[UserTable.password] = password
+                user[UserTable.fullName] = fullName
+                user[UserTable.address] = address
+                user[UserTable.city] = city
+                user[UserTable.country]= country
+                user[UserTable.phoneNumber] = phoneNumber
             }
         }
 
