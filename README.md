@@ -72,7 +72,17 @@ To install Flexi Store Server locally, follow these steps:
 
 # Screenshots
 
-Add screenshots of your application here.
+![Screenshot 1](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/1.png)
+![Screenshot 2](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/2.png)
+![Screenshot 3](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/3.png)
+![Screenshot 4](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/4.png)
+![Screenshot 5](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/5.png)
+![Screenshot 6](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/6.png)
+![Screenshot 7](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/7.png)
+![Screenshot 8](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/8.png)
+![Screenshot 9](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/9.png)
+![Screenshot 10](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/10.png)
+![Screenshot 11](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/11.png)
 
 # Contributing
 
