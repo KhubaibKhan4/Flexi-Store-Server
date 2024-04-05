@@ -116,7 +116,7 @@ class UsersRepository : UsersDao {
         .withAudience(jwtAudience)
         .withIssuer(jwtIssuer)
         .build()
-    fun generateJwtToken(password: String): String{
+    private fun generateJwtToken(password: String): String{
         return JWT.create()
             .withAudience(jwtAudience)
             .withIssuer(jwtIssuer)
