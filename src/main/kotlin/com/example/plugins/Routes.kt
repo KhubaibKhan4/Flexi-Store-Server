@@ -1,5 +1,7 @@
 package com.example.plugins
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import com.example.domain.reppository.category.CategoryRepository
 import com.example.domain.reppository.product.ProductRepository
 import com.example.domain.reppository.user.UsersRepository
@@ -12,10 +14,32 @@ import io.ktor.server.routing.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.util.*
 
 fun Route.users(
     db: UsersRepository
 ) {
+     fun validateJwtToken(token: String, password: String): Boolean {
+        return try {
+            val payload = JWT.decode(token)
+            payload.subject == password
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+     fun generateJwtToken(email: String): String {
+        val jwtSecret = "your_secret"
+        val jwtIssuer = "your_issuer"
+        val jwtAudience = "your_audience"
+
+        return JWT.create()
+            .withAudience(jwtAudience)
+            .withIssuer(jwtIssuer)
+            .withSubject(email)
+            .withExpiresAt(Date(System.currentTimeMillis() + 360000))
+            .sign(Algorithm.HMAC256(jwtSecret))
+    }
     post("v1/users") {
         val parameters = call.receive<Parameters>()
         val userName = parameters["username"] ?: return@post call.respondText(

@@ -14,6 +14,10 @@ interface UsersDao {
         phoneNumber: String,
         userRole: String
     ): Users?
+    suspend fun login(
+        email: String,
+        password: String
+    ):Users?
 
     suspend fun getAllUsers(): List<Users>?
     suspend fun getUserById(id: Long): Users?
