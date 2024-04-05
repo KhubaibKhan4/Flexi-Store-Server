@@ -1,5 +1,10 @@
 package com.example.domain.reppository.user
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.interfaces.Payload
 import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.user.UserTable
 import com.example.data.repository.users.UsersDao
@@ -8,9 +13,12 @@ import org.h2.engine.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import java.util.*
 
 class UsersRepository : UsersDao {
-
+    private val jwtSecret: String= "sectret"
+    private val jwtAudience: String = "jwtAudience"
+    private val jwtIssuer: String ="jwtIssuer"
     private fun rowToResult(row: ResultRow): Users? {
         if (row == null) {
             return null
@@ -47,7 +55,7 @@ class UsersRepository : UsersDao {
             statement = UserTable.insert { users ->
                 users[UserTable.username] = username
                 users[UserTable.email] = email
-                users[UserTable.password] = password
+                users[UserTable.password] = generateJwtToken(password)
                 users[UserTable.fullName] = fullName
                 users[UserTable.address] = address
                 users[UserTable.city] = city
@@ -95,7 +103,7 @@ class UsersRepository : UsersDao {
                 user[UserTable.id] = id
                 user[UserTable.username] = username
                 user[UserTable.email] = email
-                user[UserTable.password] = password
+                user[UserTable.password] = generateJwtToken(password)
                 user[UserTable.fullName] = fullName
                 user[UserTable.address] = address
                 user[UserTable.city] = city
@@ -103,5 +111,26 @@ class UsersRepository : UsersDao {
                 user[UserTable.phoneNumber] = phoneNumber
             }
         }
+
+    private val jwtVerifier : JWTVerifier = JWT.require(Algorithm.HMAC256(jwtSecret))
+        .withAudience(jwtAudience)
+        .withIssuer(jwtIssuer)
+        .build()
+    fun generateJwtToken(password: String): String{
+        return JWT.create()
+            .withAudience(jwtAudience)
+            .withIssuer(jwtIssuer)
+            .withSubject(password)
+            .withExpiresAt(Date(System.currentTimeMillis() + 360000))
+            .sign(Algorithm.HMAC256(jwtSecret))
+    }
+    fun validateJwtToken(token: String): String?{
+        return try {
+            val payload : Payload = jwtVerifier.verify(token)
+            payload.subject
+        }catch (e: JWTVerificationException){
+            null
+        }
+    }
 
 }
