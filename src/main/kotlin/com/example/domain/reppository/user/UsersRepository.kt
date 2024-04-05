@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.auth0.jwt.interfaces.Payload
 import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.user.UserTable
@@ -14,12 +15,14 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.security.MessageDigest
 import java.util.*
 
 class UsersRepository : UsersDao {
     private val jwtSecret: String= "sectret"
     private val jwtAudience: String = "jwtAudience"
     private val jwtIssuer: String ="jwtIssuer"
+
     private fun rowToResult(row: ResultRow): Users? {
         if (row == null) {
             return null
@@ -56,7 +59,7 @@ class UsersRepository : UsersDao {
             statement = UserTable.insert { users ->
                 users[UserTable.username] = username
                 users[UserTable.email] = email
-                users[UserTable.password] = generateJwtToken(password)
+                users[UserTable.password] = hashPassword(password)
                 users[UserTable.fullName] = fullName
                 users[UserTable.address] = address
                 users[UserTable.city] = city
@@ -74,8 +77,7 @@ class UsersRepository : UsersDao {
             val result = UserTable.select { UserTable.email eq email }.singleOrNull()
             result?.let { row ->
                 val storedPassword = row[UserTable.password]
-                val decodedPassword = validateJwtToken(storedPassword)
-                if (decodedPassword == password) {
+                if (verifyPassword(password, storedPassword)) {
                     user = rowToResult(row)
                 }
             }
@@ -119,7 +121,7 @@ class UsersRepository : UsersDao {
                 user[UserTable.id] = id
                 user[UserTable.username] = username
                 user[UserTable.email] = email
-                user[UserTable.password] = generateJwtToken(password)
+                user[UserTable.password] = hashPassword(password)
                 user[UserTable.fullName] = fullName
                 user[UserTable.address] = address
                 user[UserTable.city] = city
@@ -132,21 +134,38 @@ class UsersRepository : UsersDao {
         .withAudience(jwtAudience)
         .withIssuer(jwtIssuer)
         .build()
-    private fun generateJwtToken(password: String): String{
+    private fun generateJwtToken(password: String): String {
+        val expirationTimeMillis = System.currentTimeMillis() + 3600 * 1000
         return JWT.create()
             .withAudience(jwtAudience)
             .withIssuer(jwtIssuer)
             .withSubject(password)
-            .withExpiresAt(Date(System.currentTimeMillis() + 360000))
+            .withExpiresAt(Date(expirationTimeMillis))
             .sign(Algorithm.HMAC256(jwtSecret))
     }
-    fun validateJwtToken(token: String): String?{
+
+    fun validateJwtToken(token: String): String? {
         return try {
-            val payload : Payload = jwtVerifier.verify(token)
+            val payload: Payload = jwtVerifier.verify(token)
             payload.subject
-        }catch (e: JWTVerificationException){
+        } catch (e: TokenExpiredException) {
+            println("Token has expired: ${e.message}")
+            null
+        } catch (e: JWTVerificationException) {
+            println("JWT verification failed: ${e.message}")
             null
         }
     }
+    private fun hashPassword(password: String): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hashedBytes = digest.digest(password.toByteArray(Charsets.UTF_8))
+        return hashedBytes.joinToString("") { "%02x".format(it) }
+    }
+
+    private fun verifyPassword(providedPassword: String, hashedPassword: String): Boolean {
+        val hashedProvidedPassword = hashPassword(providedPassword)
+        return hashedProvidedPassword == hashedPassword
+    }
+
 
 }
