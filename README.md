@@ -1,4 +1,4 @@
-  # Flexi-Store-Server
+ # Flexi-Store-Server
     
     Flexi Store is an Ecommerce Application Server.
     
@@ -81,6 +81,20 @@
     - **GET /v1/products/{id}**: Get product by ID.
     - **DELETE /v1/products/{id}**: Delete product by ID.
     - **PUT /v1/products/{id}**: Update product by ID.
+    
+    ## Screenshots
+    
+    ![Screenshot 1](assets/1.png)
+    ![Screenshot 2](assets/2.png)
+    ![Screenshot 3](assets/3.png)
+    ![Screenshot 4](assets/4.png)
+    ![Screenshot 5](assets/5.png)
+    ![Screenshot 6](assets/6.png)
+    ![Screenshot 7](assets/7.png)
+    ![Screenshot 8](assets/8.png)
+    ![Screenshot 9](assets/9.png)
+    ![Screenshot 10](assets/10.png)
+    ![Screenshot 11](assets/11.png)
     
     ## Contributing
     
