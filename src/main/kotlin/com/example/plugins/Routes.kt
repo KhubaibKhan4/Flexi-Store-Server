@@ -1,7 +1,5 @@
 package com.example.plugins
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.example.domain.reppository.category.CategoryRepository
 import com.example.domain.reppository.product.ProductRepository
 import com.example.domain.reppository.user.UsersRepository
@@ -14,32 +12,10 @@ import io.ktor.server.routing.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
 
 fun Route.users(
     db: UsersRepository
 ) {
-     fun validateJwtToken(token: String, password: String): Boolean {
-        return try {
-            val payload = JWT.decode(token)
-            payload.subject == password
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-     fun generateJwtToken(email: String): String {
-        val jwtSecret = "your_secret"
-        val jwtIssuer = "your_issuer"
-        val jwtAudience = "your_audience"
-
-        return JWT.create()
-            .withAudience(jwtAudience)
-            .withIssuer(jwtIssuer)
-            .withSubject(email)
-            .withExpiresAt(Date(System.currentTimeMillis() + 360000))
-            .sign(Algorithm.HMAC256(jwtSecret))
-    }
     post("v1/users") {
         val parameters = call.receive<Parameters>()
         val userName = parameters["username"] ?: return@post call.respondText(
@@ -88,6 +64,28 @@ fun Route.users(
             }
         } catch (e: Exception) {
             call.respond(status = HttpStatusCode.Unauthorized, "Error While Upload Data to Server ${e.message}")
+        }
+    }
+    post("v1/login") {
+        val parameters = call.receive<Parameters>()
+        val email = parameters["email"] ?: return@post call.respondText(
+            text = "Email Missing",
+            status = HttpStatusCode.Unauthorized
+        )
+        val password = parameters["password"] ?: return@post call.respondText(
+            text = "Password Missing",
+            status = HttpStatusCode.Unauthorized
+        )
+
+        try {
+            val user = db.login(email, password)
+            if (user != null) {
+                call.respond(HttpStatusCode.OK, "Login Successful")
+            } else {
+                call.respond(HttpStatusCode.Unauthorized, "Invalid Email or Password")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Error during login: ${e.message}")
         }
     }
     get("v1/users") {
@@ -467,9 +465,9 @@ fun Route.products(
         var promotionDescription: String? = null
         var averageRating: Double? = null
         val uploadDir = File("upload/products/")
-        if (uploadDir.exists()){
+        if (uploadDir.exists()) {
             uploadDir.mkdirs()
-    }
+        }
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
@@ -655,7 +653,7 @@ fun Route.products(
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName?.replace(" ","_") ?: "image_${System.currentTimeMillis()}"
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "image_${System.currentTimeMillis()}"
                     val file = File("upload/products", fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
@@ -664,6 +662,7 @@ fun Route.products(
                     }
                     imageUrl = "/upload/products/$fileName"
                 }
+
                 is PartData.FormItem -> {
                     when (partData.name) {
                         "name" -> name = partData.value
@@ -683,6 +682,7 @@ fun Route.products(
                         "averageRating" -> averageRating = partData.value.toDoubleOrNull()
                     }
                 }
+
                 else -> {
 
                 }
@@ -694,17 +694,29 @@ fun Route.products(
                 name ?: return@put call.respondText("Name Missing", status = HttpStatusCode.BadRequest),
                 description ?: return@put call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
                 price ?: return@put call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
-                categoryId ?: return@put call.respondText("Category ID Missing or Invalid", status = HttpStatusCode.BadRequest),
-                categoryTitle ?: return@put call.respondText("Category Title Missing", status = HttpStatusCode.BadRequest),
+                categoryId ?: return@put call.respondText(
+                    "Category ID Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                categoryTitle ?: return@put call.respondText(
+                    "Category Title Missing",
+                    status = HttpStatusCode.BadRequest
+                ),
                 imageUrl ?: return@put call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
                 created_at ?: return@put call.respondText("Created At Missing", status = HttpStatusCode.BadRequest),
                 updated_at ?: return@put call.respondText("Updated At Missing", status = HttpStatusCode.BadRequest),
-                total_stack ?: return@put call.respondText("Total Stack Missing or Invalid", status = HttpStatusCode.BadRequest),
+                total_stack ?: return@put call.respondText(
+                    "Total Stack Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 brand ?: return@put call.respondText("Brand Missing", status = HttpStatusCode.BadRequest),
                 weight ?: return@put call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
                 dimensions ?: return@put call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
                 isAvailable ?: false,
-                discountPrice ?: return@put call.respondText("Discount Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                discountPrice ?: return@put call.respondText(
+                    "Discount Price Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 promotionDescription ?: "",
                 averageRating ?: 0.0
             )
@@ -721,7 +733,7 @@ fun Route.products(
                 )
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.BadRequest,
                 "Error While Updating Products ${e.message}"

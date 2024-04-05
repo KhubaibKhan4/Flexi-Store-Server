@@ -13,6 +13,7 @@ import org.h2.engine.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
 class UsersRepository : UsersDao {
@@ -65,6 +66,21 @@ class UsersRepository : UsersDao {
             }
         }
         return rowToResult(statement?.resultedValues?.get(0)!!)
+    }
+
+    override suspend fun login(email: String, password: String): Users? {
+        var user: Users? = null
+        transaction {
+            val result = UserTable.select { UserTable.email eq email }.singleOrNull()
+            result?.let { row ->
+                val storedPassword = row[UserTable.password]
+                val decodedPassword = validateJwtToken(storedPassword)
+                if (decodedPassword == password) {
+                    user = rowToResult(row)
+                }
+            }
+        }
+        return user
     }
 
     override suspend fun getAllUsers(): List<Users>? =
