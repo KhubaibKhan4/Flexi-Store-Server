@@ -442,12 +442,15 @@ fun Route.products(
         var discountPrice: Long? = null
         var promotionDescription: String? = null
         var averageRating: Double? = null
-
+        val uploadDir = File("upload/products/")
+        if (uploadDir.exists()){
+            uploadDir.mkdirs()
+    }
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
                     val fileName = partData.originalFileName ?: "image${System.currentTimeMillis()}"
-                    val file = File("/upload/products", fileName)
+                    val file = File(uploadDir, fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
                             input.copyTo(output)
@@ -510,8 +513,14 @@ fun Route.products(
                     "Discount Price Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 ),
-                promotionDescription ?: "",
-                averageRating ?: 0.0
+                promotionDescription ?: return@post call.respondText(
+                    "Promotion Description Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                averageRating ?: return@post call.respondText(
+                    "Average Rating Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                )
             )
             product?.id?.let {
                 call.respond(

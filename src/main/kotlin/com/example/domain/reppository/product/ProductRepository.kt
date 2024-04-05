@@ -8,6 +8,7 @@ import com.example.domain.model.product.Product
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.transactions.transaction
 import javax.xml.crypto.Data
 
 class ProductRepository : ProductDao {
@@ -29,29 +30,35 @@ class ProductRepository : ProductDao {
         promotionDescription: String,
         averageRating: Double
     ): Product? {
-
-        var statement: InsertStatement<Number>? = null
-        DatabaseFactory.dbQuery {
-            statement = ProductTable.insert { product ->
-                product[ProductTable.name] = name
-                product[ProductTable.description] = description
-                product[ProductTable.price] = price
-                product[ProductTable.categoryId] = categoryId
-                product[ProductTable.categoryTitle] = categoryTitle
-                product[ProductTable.imageUrl] = imageUrl
-                product[ProductTable.created_at] = created_at
-                product[ProductTable.updated_at] = updated_at
-                product[ProductTable.total_stack] = total_stack
-                product[ProductTable.brand] = brand
-                product[ProductTable.weight] = weight
-                product[ProductTable.dimensions] = dimensions
-                product[ProductTable.isAvailable] = isAvailable
-                product[ProductTable.discountPrice] = discountPrice
-                product[ProductTable.promotionDescription] = promotionDescription
-                product[ProductTable.averageRating] = averageRating
+        return try {
+            transaction {
+                val statement = ProductTable.insert { product ->
+                    product[ProductTable.name] = name
+                    product[ProductTable.description] = description
+                    product[ProductTable.price] = price
+                    product[ProductTable.categoryId] = categoryId
+                    product[ProductTable.categoryTitle] = categoryTitle
+                    product[ProductTable.imageUrl] = imageUrl
+                    product[ProductTable.created_at] = created_at
+                    product[ProductTable.updated_at] = updated_at
+                    product[ProductTable.total_stack] = total_stack
+                    product[ProductTable.brand] = brand
+                    product[ProductTable.weight] = weight
+                    product[ProductTable.dimensions] = dimensions
+                    product[ProductTable.isAvailable] = isAvailable
+                    product[ProductTable.discountPrice] = discountPrice
+                    product[ProductTable.promotionDescription] = promotionDescription
+                    product[ProductTable.averageRating] = averageRating
+                }
+                // Extract the first resulted value (if any)
+                val firstResult = statement.resultedValues?.firstOrNull()!!
+                // Convert the row to a Product object
+                rowToResult(firstResult)
             }
+        } catch (e: Exception) {
+            // Handle any exceptions that occur during the transaction
+            null
         }
-        return rowToResult(statement?.resultedValues?.get(0)!!)
     }
 
     override suspend fun getAllProducts(): List<Product>? {
