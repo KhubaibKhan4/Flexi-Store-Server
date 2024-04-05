@@ -631,8 +631,8 @@ fun Route.products(
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName ?: "image_${System.currentTimeMillis()}"
-                    val file = File("/upload/products", fileName)
+                    val fileName = partData.originalFileName?.replace(" ","_") ?: "image_${System.currentTimeMillis()}"
+                    val file = File("upload/products", fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
                             input.copyTo(output)
