@@ -562,7 +562,7 @@ fun Route.products(
             status = HttpStatusCode.BadRequest
         )
         try {
-            val products = db.deleteProductById(id.toLong())
+            val products = db.getProductById(id.toLong())
             if (products == null) {
                 call.respond(HttpStatusCode.BadRequest, "No Products Found")
             } else {
