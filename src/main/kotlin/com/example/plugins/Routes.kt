@@ -449,7 +449,7 @@ fun Route.products(
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName ?: "image${System.currentTimeMillis()}"
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
                     val file = File(uploadDir, fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
@@ -457,7 +457,7 @@ fun Route.products(
                         }
 
                     }
-                    imageUrl = "/upload/products/$fileName"
+                    imageUrl = "/upload/products/${fileName}"
                 }
 
                 is PartData.FormItem -> {
