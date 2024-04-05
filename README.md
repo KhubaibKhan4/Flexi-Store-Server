@@ -1,6 +1,6 @@
 # Flexi-Store-Server
 
-Flexi Store is an Ecommerce Application Server.
+Flexi Store is an Ecommerce Application Server designed to provide a flexible and scalable backend for online stores.
 
 ## Table of Contents
 
