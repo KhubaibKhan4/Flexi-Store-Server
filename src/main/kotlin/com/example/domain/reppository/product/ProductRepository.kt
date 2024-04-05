@@ -1,5 +1,6 @@
 package com.example.domain.reppository.product
 
+import com.example.data.local.table.category.CategoryTable
 import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.product.ProductTable
 import com.example.data.repository.product.ProductDao
@@ -122,13 +123,16 @@ class ProductRepository : ProductDao {
         return if (row == null) {
             null
         } else {
+            val categoryTitle = CategoryTable.select { CategoryTable.id eq row[ProductTable.categoryId] }
+                .map { it[CategoryTable.name] }
+                .singleOrNull() ?: ""
             Product(
                 id = row[ProductTable.id],
                 name = row[ProductTable.name],
                 description = row[ProductTable.description],
                 price = row[ProductTable.price],
                 categoryId = row[ProductTable.categoryId],
-                categoryTitle = row[ProductTable.categoryTitle],
+                categoryTitle = categoryTitle,
                 imageUrl = row[ProductTable.imageUrl],
                 created_at = row[ProductTable.created_at],
                 updated_at = row[ProductTable.updated_at],
