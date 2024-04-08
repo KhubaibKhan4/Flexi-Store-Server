@@ -1,5 +1,6 @@
 package com.example.plugins
 
+import com.example.domain.model.login.LoginResponse
 import com.example.domain.model.user.Users
 import com.example.domain.reppository.category.CategoryRepository
 import com.example.domain.reppository.product.ProductRepository
@@ -10,6 +11,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.h2.engine.User
 import java.io.File
@@ -83,8 +85,9 @@ fun Route.users(
         try {
             val user = db.login(email, password)
             if (user != null) {
-                val userDataJson = Json.encodeToString(Users.serializer(), user)
-                call.respond(HttpStatusCode.OK, "{\"message\":\"Login Successful\",\"user\":$userDataJson}")
+                val loginResponse = LoginResponse("Login Successful", user)
+                val responseJson = Json { prettyPrint = true }.encodeToString(loginResponse)
+                call.respondText(responseJson, ContentType.Application.Json)
             } else {
                 call.respond(HttpStatusCode.Unauthorized, "Invalid Email or Password")
             }
