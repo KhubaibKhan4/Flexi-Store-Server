@@ -1,3 +1,7 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+import java.net.InetAddress
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 val ktor_version: String by project
 val kotlin_version: String by project
@@ -21,7 +25,21 @@ application {
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
+tasks.processResources {
+    from(sourceSets["main"].resources.srcDirs)
+    into("$buildDir/upload/products")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
+    filesMatching("application.conf") {
+        filter(
+            ReplaceTokens::class, "tokens" to mapOf(
+                "BUILD_VERSION" to version,
+                "BUILD_DATE" to DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.now()),
+                "BUILD_MACHINE" to InetAddress.getLocalHost().hostName
+            )
+        )
+    }
+}
 repositories {
     mavenCentral()
 }
