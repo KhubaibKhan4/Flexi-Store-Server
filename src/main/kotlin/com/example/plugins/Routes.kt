@@ -862,38 +862,41 @@ fun Route.promotions(
             "Id Missing"
         )
         val multipart = call.receiveMultipart()
-        var title : String? = null
+        var title: String? = null
         var description: String? = null
         var imageUrl: String? = null
         var startDate: Long? = null
         var endDate: Long? = null
         var enable: Boolean? = null
-        val uploadDir = File("/upload/products/promotions")
+        val uploadDir = File("upload/products/promotions")
         if (!uploadDir.exists()){
             uploadDir.mkdirs()
         }
-        multipart.forEachPart {part ->
-            when(part){
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy")
+
+        multipart.forEachPart { partData ->
+            when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = part.originalFileName?.replace(" ","_") ?: "image/${System.currentTimeMillis()}"
+                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
                     val file = File(uploadDir,fileName)
-                   part.streamProvider().use {input->
-                       file.outputStream().use { output->
-                           input.copyTo(output)
-                       }
-                   }
+                    partData.streamProvider().use { input->
+                        file.outputStream().use { output->
+                            input.copyTo(output)
+                        }
+                    }
                     imageUrl = "/upload/products/promotions/$fileName"
                 }
+
                 is PartData.FormItem -> {
-                    when(part.name){
-                        "title" -> title = part.value
-                        "description" -> description = part.value
-                        "startDate" -> startDate = part.value.toLong()
-                        "endDate" -> endDate = part.value.toLong()
-                        "enable" -> enable = part.value.toBoolean()
+                    when(partData.name){
+                        "title" -> title = partData.value
+                        "description" -> description = partData.value
+                        "startDate" ->startDate= partData.value?.let { dateFormat.parse(it)?.time }
+                        "endDate" -> endDate = partData.value?.let { dateFormat.parse(it)?.time }
+                        "enable" -> enable = partData.value.toBoolean()
                     }
                 }
-                else ->{}
+                else -> {}
             }
         }
         try {
