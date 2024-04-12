@@ -6,9 +6,10 @@ import com.example.data.repository.promotion.PromotionDao
 import com.example.domain.model.promotion.Promotion
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
-class PromotionRepository: PromotionDao {
+class PromotionRepository : PromotionDao {
     override suspend fun insert(
         title: String,
         description: String,
@@ -18,8 +19,8 @@ class PromotionRepository: PromotionDao {
         enable: Boolean
     ): Promotion? {
         var statement: InsertStatement<Number>? = null
-         DatabaseFactory.dbQuery {
-            statement = PromotionTable.insert { promotion->
+        DatabaseFactory.dbQuery {
+            statement = PromotionTable.insert { promotion ->
                 promotion[PromotionTable.title] = title
                 promotion[PromotionTable.description] = description
                 promotion[PromotionTable.imageUrl] = imageUrl
@@ -32,7 +33,12 @@ class PromotionRepository: PromotionDao {
     }
 
     override suspend fun getPromotionsList(): List<Promotion>? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            PromotionTable.selectAll()
+                .mapNotNull {
+                    rowToResult(it)
+                }
+        }
     }
 
     override suspend fun getPromotionById(id: Long): Promotion? {
@@ -54,10 +60,11 @@ class PromotionRepository: PromotionDao {
     ) {
         TODO("Not yet implemented")
     }
+
     private fun rowToResult(row: ResultRow): Promotion? {
-        if (row == null){
+        if (row == null) {
             return null
-        }else{
+        } else {
             return Promotion(
                 id = row[PromotionTable.id],
                 title = row[PromotionTable.title],
