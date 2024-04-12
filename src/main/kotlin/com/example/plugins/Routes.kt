@@ -842,4 +842,73 @@ fun Route.promotions(
             call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve promotion: ${e.message}")
         }
     }
+    put ("v1/promotions/{id}"){
+        val id = call.parameters["id"] ?: return@put call.respond(
+            HttpStatusCode.BadRequest,
+            "Id Missing"
+        )
+        val multipart = call.receiveMultipart()
+        var title : String? = null
+        var description: String? = null
+        var imageUrl: String? = null
+        var startDate: Long? = null
+        var endDate: Long? = null
+        var enable: Boolean? = null
+        val uploadDir = File("/upload/products/promotions")
+        if (!uploadDir.exists()){
+            uploadDir.mkdirs()
+        }
+        multipart.forEachPart {part ->
+            when(part){
+                is PartData.FileItem -> {
+                    val fileName = part.originalFileName?.replace(" ","_") ?: "image/${System.currentTimeMillis()}"
+                    val file = File(uploadDir,fileName)
+                   part.streamProvider().use {input->
+                       file.outputStream().use { output->
+                           input.copyTo(output)
+                       }
+                   }
+                    imageUrl = "/upload/products/promotions/$fileName"
+                }
+                is PartData.FormItem -> {
+                    when(part.name){
+                        "title" -> title = part.value
+                        "description" -> description = part.value
+                        "startDate" -> startDate = part.value.toLong()
+                        "endDate" -> endDate = part.value.toLong()
+                        "enable" -> enable = part.value.toBoolean()
+                    }
+                }
+                else ->{}
+            }
+        }
+        try {
+            val products = db.updatePromotion(
+                id = id.toLong(),
+                title  = title ?: return@put call.respond(HttpStatusCode.BadRequest, "Title Missing"),
+                description = description ?: return@put call.respond(HttpStatusCode.BadRequest, "Description Missing"),
+                imageUrl = imageUrl ?: return@put call.respond(HttpStatusCode.BadRequest, "Image File Missing"),
+                startDate = startDate ?: return@put call.respond(HttpStatusCode.BadRequest, "Start Date Missing"),
+                endDate = endDate ?: return@put call.respond(HttpStatusCode.BadRequest,"End Date Missing"),
+                enable = enable ?: return@put call.respond(HttpStatusCode.BadRequest,"Enabled Missing")
+            )
+            if (products != null) {
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "Product Updated Successfully"
+                )
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Product with ID $id not found"
+                )
+            }
+
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.Unauthorized,
+                "Error While Uploading Promotions Products : ${e.message}"
+            )
+        }
+    }
 }
