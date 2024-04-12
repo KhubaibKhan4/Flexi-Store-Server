@@ -1,10 +1,9 @@
 package com.example.plugins
 
 import com.example.domain.model.login.LoginResponse
-import com.example.domain.model.user.Users
-import com.example.domain.reppository.category.CategoryRepository
-import com.example.domain.reppository.product.ProductRepository
-import com.example.domain.reppository.user.UsersRepository
+import com.example.domain.repository.category.CategoryRepository
+import com.example.domain.repository.product.ProductRepository
+import com.example.domain.repository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -13,7 +12,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.h2.engine.User
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths

@@ -1,4 +1,4 @@
-package com.example.domain.reppository.category
+package com.example.domain.repository.category
 
 import com.example.data.local.table.category.CategoryTable
 

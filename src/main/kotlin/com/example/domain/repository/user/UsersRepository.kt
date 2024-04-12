@@ -1,4 +1,4 @@
-package com.example.domain.reppository.user
+package com.example.domain.repository.user
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
@@ -10,7 +10,6 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.user.UserTable
 import com.example.data.repository.users.UsersDao
 import com.example.domain.model.user.Users
-import org.h2.engine.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement

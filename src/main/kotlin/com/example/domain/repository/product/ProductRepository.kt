@@ -1,4 +1,4 @@
-package com.example.domain.reppository.product
+package com.example.domain.repository.product
 
 import com.example.data.local.table.category.CategoryTable
 import com.example.data.local.table.db.DatabaseFactory
@@ -7,9 +7,7 @@ import com.example.data.repository.product.ProductDao
 import com.example.domain.model.product.Product
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.transactions.transaction
-import javax.xml.crypto.Data
 
 class ProductRepository : ProductDao {
     override suspend fun insert(
