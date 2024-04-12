@@ -16,6 +16,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.text.SimpleDateFormat
 
 fun Route.users(
     db: UsersRepository
@@ -765,6 +766,7 @@ fun Route.promotions(
         if (!uploadDir.exists()){
             uploadDir.mkdirs()
         }
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy")
 
         multipart.forEachPart { partData ->
             when (partData) {
@@ -783,8 +785,8 @@ fun Route.promotions(
                     when(partData.name){
                         "title" -> title = partData.value
                         "description" -> description = partData.value
-                        "startDate" -> startDate = partData.value.toLong()
-                        "endDate" -> endDate = partData.value.toLong()
+                        "startDate" ->startDate= partData.value?.let { dateFormat.parse(it)?.time }
+                        "endDate" -> endDate = partData.value?.let { dateFormat.parse(it)?.time }
                         "enable" -> enable = partData.value.toBoolean()
                     }
                 }
