@@ -66,7 +66,17 @@ class PromotionRepository : PromotionDao {
         endDate: Long,
         enable: Boolean
     ) {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            PromotionTable.update(({PromotionTable.id.eq(id)})){promotion ->
+                promotion[PromotionTable.id] = id
+                promotion[PromotionTable.title] = title
+                promotion[PromotionTable.description] = description
+                promotion[PromotionTable.imageUrl] = imageUrl
+                promotion[PromotionTable.startDate] = startDate
+                promotion[PromotionTable.endDate] = endDate
+                promotion[PromotionTable.enabled] = enable
+            }
+        }
     }
 
     private fun rowToResult(row: ResultRow): Promotion? {
