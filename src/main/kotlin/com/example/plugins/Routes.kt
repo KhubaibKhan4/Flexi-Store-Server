@@ -828,6 +828,18 @@ fun Route.promotions(
             call.respond(HttpStatusCode.InternalServerError, "Failed to delete promotion: ${e.message}")
         }
     }
+    get("v1/promotions") {
+        try {
+            val promotion = db.getPromotionsList()
+            if (promotion.isNullOrEmpty() ==true) {
+                call.respond(HttpStatusCode.NotFound, "No Promotion Items Available inside the Database.dd ")
+            } else {
+                call.respond(HttpStatusCode.OK, promotion)
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve promotion: ${e.message}")
+        }
+    }
     get("v1/promotions/{id}") {
         val id = call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
