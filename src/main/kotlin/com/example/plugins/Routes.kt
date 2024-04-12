@@ -3,6 +3,7 @@ package com.example.plugins
 import com.example.domain.model.login.LoginResponse
 import com.example.domain.repository.category.CategoryRepository
 import com.example.domain.repository.product.ProductRepository
+import com.example.domain.repository.promotion.PromotionRepository
 import com.example.domain.repository.user.UsersRepository
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -469,8 +470,8 @@ fun Route.products(
         var discountPrice: Long? = null
         var promotionDescription: String? = null
         var averageRating: Double? = null
-        val uploadDir = File("upload/products/")
-        if (uploadDir.exists()) {
+        val uploadDir = File("/upload/products/")
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
         multipart.forEachPart { partData ->
@@ -747,4 +748,70 @@ fun Route.products(
 
     }
 
+}
+
+fun Route.promotions(
+    db: PromotionRepository
+) {
+    post("v1/promotions") {
+        val multipart = call.receiveMultipart()
+        var title: String? = null
+        var description: String? = null
+        var imageUrl: String? = null
+        var startDate: Long? = null
+        var endDate: Long? = null
+        var enable: Boolean? = null
+        val uploadDir = File("upload/products/promotions")
+        if (!uploadDir.exists()){
+            uploadDir.mkdirs()
+        }
+
+        multipart.forEachPart { partData ->
+            when (partData) {
+                is PartData.FileItem -> {
+                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
+                    val file = File(uploadDir,fileName)
+                    partData.streamProvider().use { input->
+                        file.outputStream().use { output->
+                            input.copyTo(output)
+                        }
+                    }
+                    imageUrl = "/upload/products/promotions/$fileName"
+                }
+
+                is PartData.FormItem -> {
+                    when(partData.name){
+                        "title" -> title = partData.value
+                        "description" -> description = partData.value
+                        "startDate" -> startDate = partData.value.toLong()
+                        "endDate" -> endDate = partData.value.toLong()
+                        "enable" -> enable = partData.value.toBoolean()
+                    }
+                }
+                else -> {}
+            }
+        }
+        try {
+            val products = db.insert(
+                title  = title ?: return@post call.respond(HttpStatusCode.BadRequest, "Title Missing"),
+                description = description ?: return@post call.respond(HttpStatusCode.BadRequest, "Description Missing"),
+                imageUrl = imageUrl ?: return@post call.respond(HttpStatusCode.BadRequest, "Image File Missing"),
+                startDate = startDate ?: return@post call.respond(HttpStatusCode.BadRequest, "Start Date Missing"),
+                endDate = endDate ?: return@post call.respond(HttpStatusCode.BadRequest,"End Date Missing"),
+                enable = enable ?: return@post call.respond(HttpStatusCode.BadRequest,"Enabled Missing")
+            )
+            products.let {
+                call.respond(
+                    HttpStatusCode.Created,
+                    "Promotion Product Added Successfully... $products"
+                )
+            }
+
+        }catch (e: Exception){
+            call.respond(
+                status = HttpStatusCode.Unauthorized,
+                "Error While Uploading Promotions Products : ${e.message}"
+            )
+        }
+    }
 }

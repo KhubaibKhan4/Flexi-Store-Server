@@ -7,7 +7,6 @@ import com.example.domain.model.promotion.Promotion
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
-import javax.xml.crypto.Data
 
 class PromotionRepository : PromotionDao {
     override suspend fun insert(
