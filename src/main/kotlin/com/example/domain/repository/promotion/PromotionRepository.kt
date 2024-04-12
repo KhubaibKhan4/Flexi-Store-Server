@@ -6,6 +6,7 @@ import com.example.data.repository.promotion.PromotionDao
 import com.example.domain.model.promotion.Promotion
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.InsertStatement
 
@@ -42,7 +43,13 @@ class PromotionRepository : PromotionDao {
     }
 
     override suspend fun getPromotionById(id: Long): Promotion? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            PromotionTable.select { PromotionTable.id.eq(id) }
+                .map {
+                    rowToResult(it)
+                }
+                .single()
+        }
     }
 
     override suspend fun deletePromotionById(id: Long): Int? {
