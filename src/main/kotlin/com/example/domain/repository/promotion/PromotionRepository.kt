@@ -4,11 +4,10 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.promotion.PromotionTable
 import com.example.data.repository.promotion.PromotionDao
 import com.example.domain.model.promotion.Promotion
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import javax.xml.crypto.Data
 
 class PromotionRepository : PromotionDao {
     override suspend fun insert(
@@ -53,7 +52,9 @@ class PromotionRepository : PromotionDao {
     }
 
     override suspend fun deletePromotionById(id: Long): Int? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            PromotionTable.deleteWhere { PromotionTable.id.eq(id) }
+        }
     }
 
     override suspend fun updatePromotion(
