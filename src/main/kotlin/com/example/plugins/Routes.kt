@@ -814,4 +814,32 @@ fun Route.promotions(
             )
         }
     }
+    delete("v1/promotions/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+        try {
+            val deletedCount = db.deletePromotionById(id)
+            if (deletedCount != null && deletedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Promotion with ID $id deleted successfully")
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Promotion with ID $id not found")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to delete promotion: ${e.message}")
+        }
+    }
+    get("v1/promotions/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+        try {
+            val promotion = db.getPromotionById(id)
+            if (promotion != null) {
+                call.respond(HttpStatusCode.OK, promotion)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Promotion with ID $id not found")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve promotion: ${e.message}")
+        }
+    }
 }
