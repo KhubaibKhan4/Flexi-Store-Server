@@ -239,6 +239,10 @@ fun Route.category(
         var description: String? = null
         var isVisible: Boolean? = null
         var imageUrl: String? = null
+        val uploadDir = File("upload/products/categories")
+        if (!uploadDir.exists()){
+            uploadDir.mkdirs()
+        }
 
         multipart.forEachPart { part ->
             when (part) {
@@ -251,20 +255,19 @@ fun Route.category(
                 }
 
                 is PartData.FileItem -> {
-                    val fileBytes = part.streamProvider().readBytes()
-                    val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
-                    val directoryPath = File("/var/www/uploads")
-                    if (!directoryPath.exists()) {
-                        directoryPath.mkdirs()
+                    val fileName = part.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
+                    val file = File(uploadDir, fileName)
+                    part.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
+
                     }
-                    val filePath = "$directoryPath/$fileName"
-                    File(filePath).writeBytes(fileBytes)
-                    imageUrl = "/uploads/${fileName.replace(" ", "_")}"
+                    imageUrl = "/upload/products/categories/${fileName}"
                 }
 
                 else -> {}
             }
-            part.dispose()
         }
 
         name ?: return@post call.respond(
@@ -381,6 +384,10 @@ fun Route.category(
         var description: String? = null
         var isVisible: Boolean? = null
         var imageUrl: String? = null
+        val uploadDir = File("upload/products/categories")
+        if (!uploadDir.exists()){
+            uploadDir.mkdirs()
+        }
 
         multipart.forEachPart { part ->
             when (part) {
@@ -393,24 +400,19 @@ fun Route.category(
                 }
 
                 is PartData.FileItem -> {
-                    val fileBytes = part.streamProvider().readBytes()
-                    val fileName = part.originalFileName ?: "uploaded_image_${System.currentTimeMillis()}"
-                    val directoryPath = Paths.get("/var/www/uploads/") // Adjust the directory path as needed
+                    val fileName = part.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
+                    val file = File(uploadDir, fileName)
+                    part.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
 
-                    // Create the directory if it doesn't exist
-                    if (!Files.exists(directoryPath)) {
-                        Files.createDirectories(directoryPath)
                     }
-
-                    val filePath = "$directoryPath/$fileName"
-                    Files.write(Paths.get(filePath), fileBytes)
-                    imageUrl = "/uploads/categories/${fileName.replace(" ", "_")}"
+                    imageUrl = "/upload/products/categories/${fileName}"
                 }
 
-                is PartData.BinaryChannelItem -> TODO()
-                is PartData.BinaryItem -> TODO()
+                else -> {}
             }
-            part.dispose()
         }
 
         name ?: return@put call.respond(
