@@ -78,7 +78,8 @@ To install Flexi Store Server locally, follow these steps:
 - **DELETE /v1/promotions/{id}**: Delete promotions product by ID.
 - **PUT /v1/promotions/{id}**: Update promotions product by ID.
 
-If you are a Generoues Enough Then Please Buy me a Coffee: <a href="https://www.buymeacoffee.com/khubaibkhan"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=khubaibkhan&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+If you are a Generoues Enough Then Please Buy me a Coffee:
+<a href="https://www.buymeacoffee.com/khubaibkhan"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=khubaibkhan&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
 
 # Screenshots
 
