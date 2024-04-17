@@ -26,7 +26,9 @@ class ProductRepository : ProductDao {
         isAvailable: Boolean,
         discountPrice: Long,
         promotionDescription: String,
-        averageRating: Double
+        averageRating: Double,
+        manufacturer: String,
+        colors: String
     ): Product? {
         return try {
             transaction {
@@ -47,14 +49,14 @@ class ProductRepository : ProductDao {
                     product[ProductTable.discountPrice] = discountPrice
                     product[ProductTable.promotionDescription] = promotionDescription
                     product[ProductTable.averageRating] = averageRating
+                    product[ProductTable.isFeature] = isFeature
+                    product[ProductTable.manufacturer] = manufacturer
+                    product[ProductTable.colors] = colors
                 }
-                // Extract the first resulted value (if any)
                 val firstResult = statement.resultedValues?.firstOrNull()!!
-                // Convert the row to a Product object
                 rowToResult(firstResult)
             }
         } catch (e: Exception) {
-            // Handle any exceptions that occur during the transaction
             null
         }
     }
@@ -73,7 +75,7 @@ class ProductRepository : ProductDao {
             ProductTable.select { ProductTable.id.eq(id) }
                 .map {
                     rowToResult(it)
-                }.single()
+                }.singleOrNull()
         }
     }
 
@@ -100,10 +102,13 @@ class ProductRepository : ProductDao {
         isAvailable: Boolean,
         discountPrice: Long,
         promotionDescription: String,
-        averageRating: Double
+        averageRating: Double,
+        isFeature: Boolean,
+        manufacturer: String,
+        colors: String
     ): Int? {
         return DatabaseFactory.dbQuery {
-            ProductTable.update({ProductTable.id.eq(id)}){product->
+            ProductTable.update({ ProductTable.id.eq(id) }) { product ->
                 product[ProductTable.name] = name
                 product[ProductTable.description] = description
                 product[ProductTable.price] = price
@@ -120,6 +125,9 @@ class ProductRepository : ProductDao {
                 product[ProductTable.discountPrice] = discountPrice
                 product[ProductTable.promotionDescription] = promotionDescription
                 product[ProductTable.averageRating] = averageRating
+                product[ProductTable.isFeature] = isFeature
+                product[ProductTable.manufacturer] = manufacturer
+                product[ProductTable.colors] = colors
             }
         }
     }
@@ -148,9 +156,11 @@ class ProductRepository : ProductDao {
                 isAvailable = row[ProductTable.isAvailable],
                 discountPrice = row[ProductTable.discountPrice],
                 promotionDescription = row[ProductTable.promotionDescription],
-                averageRating = row[ProductTable.averageRating]
+                averageRating = row[ProductTable.averageRating],
+                isFeatured = row[ProductTable.isFeature],
+                manufacturer = row[ProductTable.manufacturer],
+                colors = row[ProductTable.colors]
             )
         }
     }
-
 }
