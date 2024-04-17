@@ -484,7 +484,7 @@ fun Route.products(
             when (partData) {
                 is PartData.FileItem -> {
                     val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
-                    val file = File(uploadDir, fileName)
+                    val file = File("upload/products", fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
                             input.copyTo(output)
