@@ -140,6 +140,7 @@ class ProductRepository : ProductDao {
             val categoryTitle = CategoryTable.select { CategoryTable.id eq row[ProductTable.categoryId] }
                 .map { it[CategoryTable.name] }
                 .singleOrNull() ?: ""
+            val isFeature = row[ProductTable.isFeature] ?: false
             Product(
                 id = row[ProductTable.id],
                 name = row[ProductTable.name],
@@ -158,7 +159,7 @@ class ProductRepository : ProductDao {
                 discountPrice = row[ProductTable.discountPrice],
                 promotionDescription = row[ProductTable.promotionDescription],
                 averageRating = row[ProductTable.averageRating],
-                isFeatured = row[ProductTable.isFeature],
+                isFeatured = isFeature,
                 manufacturer = row[ProductTable.manufacturer],
                 colors = row[ProductTable.colors]
             )

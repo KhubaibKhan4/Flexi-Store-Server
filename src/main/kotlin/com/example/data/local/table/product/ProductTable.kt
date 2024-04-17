@@ -21,7 +21,7 @@ object ProductTable:Table("Product") {
     val discountPrice: Column<Long> = long("discountPrice")
     val promotionDescription: Column<String> = varchar("promotionDescription", length = 151)
     val averageRating: Column<Double> = double("averageRating")
-    val isFeature: Column<Boolean> = bool("isFeature")
+    val isFeature: Column<Boolean> = bool("isfeature")
     val manufacturer: Column<String> = varchar("manufacturer",450)
     val colors: Column<String> = varchar("colors", 1000)
 
