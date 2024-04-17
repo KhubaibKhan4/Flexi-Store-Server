@@ -21,5 +21,7 @@ data class Product(
     val discountPrice: Long,
     val promotionDescription: String,
     val averageRating: Double,
-    val isFeatured: Boolean
+    val isFeatured: Boolean,
+    val manufacturer: String,
+    val colors: String,
 )
