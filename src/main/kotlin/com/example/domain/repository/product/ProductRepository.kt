@@ -27,6 +27,7 @@ class ProductRepository : ProductDao {
         discountPrice: Long,
         promotionDescription: String,
         averageRating: Double,
+        isFeature: Boolean,
         manufacturer: String,
         colors: String
     ): Product? {

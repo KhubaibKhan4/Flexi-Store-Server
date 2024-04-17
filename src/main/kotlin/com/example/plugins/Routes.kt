@@ -473,6 +473,9 @@ fun Route.products(
         var discountPrice: Long? = null
         var promotionDescription: String? = null
         var averageRating: Double? = null
+        var isFeature: Boolean? = null
+        var manufacturer: String? = null
+        var colors : String? = null
         val uploadDir = File("/upload/products/")
         if (!uploadDir.exists()) {
             uploadDir.mkdirs()
@@ -508,6 +511,9 @@ fun Route.products(
                         "discountPrice" -> discountPrice = partData.value.toLongOrNull()
                         "promotionDescription" -> promotionDescription = partData.value
                         "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                        "isFeature" -> isFeature = partData.value.toBoolean()
+                        "manufacturer" -> manufacturer = partData.value
+                        "colors" -> colors = partData.value
                     }
                 }
 
@@ -550,6 +556,18 @@ fun Route.products(
                 ),
                 averageRating ?: return@post call.respondText(
                     "Average Rating Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                isFeature ?: return@post call.respondText(
+                    "isFeature Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                manufacturer ?:return@post call.respondText(
+                    "manufacturer Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                colors ?:return@post call.respondText(
+                    "colors Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 )
             )
@@ -658,6 +676,9 @@ fun Route.products(
         var discountPrice: Long? = null
         var promotionDescription: String? = null
         var averageRating: Double? = null
+        var isFeature: Boolean? = null
+        var manufacturer: String? = null
+        var colors : String? = null
 
         multipart.forEachPart { partData ->
             when (partData) {
@@ -676,7 +697,7 @@ fun Route.products(
                     when (partData.name) {
                         "name" -> name = partData.value
                         "description" -> description = partData.value
-                        "price" -> price = partData.value.toLongOrNull()
+                        "price" -> price = partData.value.toLong()
                         "categoryId" -> categoryId = partData.value.toLongOrNull()
                         "categoryTitle" -> categoryTitle = partData.value
                         "created_at" -> created_at = partData.value
@@ -689,6 +710,9 @@ fun Route.products(
                         "discountPrice" -> discountPrice = partData.value.toLongOrNull()
                         "promotionDescription" -> promotionDescription = partData.value
                         "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                        "isFeature" -> isFeature = partData.value.toBoolean()
+                        "manufacturer" -> manufacturer = partData.value
+                        "colors" -> colors = partData.value
                     }
                 }
 
@@ -727,7 +751,19 @@ fun Route.products(
                     status = HttpStatusCode.BadRequest
                 ),
                 promotionDescription ?: "",
-                averageRating ?: 0.0
+                averageRating ?: 0.0,
+                isFeature ?: return@put call.respondText(
+                    "isFeature Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                manufacturer ?:return@put call.respondText(
+                    "manufacturer Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                colors ?:return@put call.respondText(
+                    "colors Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                )
             )
 
             if (result != null && result > 0) {
