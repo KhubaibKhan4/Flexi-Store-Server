@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Books(
-    val id: Int,
+    val id: Long,
     val title: String,
     val author: String,
     val description: String,
@@ -22,10 +22,10 @@ data class Books(
     val language: String,
     val format: String,
     val edition: String,
-    val genre: List<String>,
+    val genre: String,
     val publicationDate: String,
     val binding: String,
-    val tableOfContents: List<String>,
+    val tableOfContents: String,
     val awards: String,
     val contributors: String,
     val annotations: String?,

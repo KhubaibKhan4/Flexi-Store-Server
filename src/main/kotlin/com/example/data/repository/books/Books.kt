@@ -1,5 +1,7 @@
 package com.example.data.repository.books
 
+import com.example.domain.model.books.Books
+
 interface BooksDao {
     suspend fun insert(
         title: String,
@@ -27,10 +29,10 @@ interface BooksDao {
         contributors: String,
         annotations: String?,
         tags: String
-    ): BooksDao?
+    ): Books?
 
-    suspend fun getAllBooks(): List<BooksDao>?
-    suspend fun getBookById(id: Long): BooksDao?
+    suspend fun getAllBooks(): List<Books>?
+    suspend fun getBookById(id: Long): Books?
     suspend fun deleteBookById(id: Long): Int?
     suspend fun updateBookById(
         id: Long,

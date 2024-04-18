@@ -3,7 +3,7 @@ package com.example.data.local.table.books
 import org.jetbrains.exposed.sql.Table
 
 object BooksTable: Table("Books") {
-    val id = integer("id").autoIncrement()
+    val id = long("id").autoIncrement()
     val title = varchar("title", length = 500)
     val author = varchar("author", length = 250)
     val description = varchar("description", length = 1000)
