@@ -1,6 +1,7 @@
 package com.example.plugins
 
 import com.example.domain.model.login.LoginResponse
+import com.example.domain.repository.books.BooksRepository
 import com.example.domain.repository.category.CategoryRepository
 import com.example.domain.repository.product.ProductRepository
 import com.example.domain.repository.promotion.PromotionRepository
@@ -966,4 +967,300 @@ fun Route.promotions(
             )
         }
     }
+}
+fun Route.books(
+    db: BooksRepository
+){
+    post("v1/books") {
+        val multipart = call.receiveMultipart()
+        var title: String? = null
+        var author: String? = null
+        var description: String? = null
+        var price: Double? = null
+        var category: String? = null
+        var imageUrl: String? = null
+        var isbn: String? = null
+        var pageCount: Int? = null
+        var publisher: String? = null
+        var publicationYear: Int? = null
+        var averageRating: Double? = null
+        var stock: Int? = null
+        var dimensions: String? = null
+        var weight: Double? = null
+        var language: String? = null
+        var format: String? = null
+        var edition: String? = null
+        var genre: String? = null
+        var publicationDate: String? = null
+        var binding: String? = null
+        var tableOfContents: String? = null
+        var awards: String? = null
+        var contributors: String? = null
+        var annotations: String? = null
+        var tags: String? = null
+
+        val uploadDir = File("/upload/books/")
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs()
+        }
+
+        multipart.forEachPart { partData ->
+            when (partData) {
+                is PartData.FileItem -> {
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
+                    val file = File("upload/books", fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    imageUrl = "/upload/books/$fileName"
+                }
+
+                is PartData.FormItem -> {
+                    when (partData.name) {
+                        "title" -> title = partData.value
+                        "author" -> author = partData.value
+                        "description" -> description = partData.value
+                        "price" -> price = partData.value.toDoubleOrNull()
+                        "category" -> category = partData.value
+                        "isbn" -> isbn = partData.value
+                        "pageCount" -> pageCount = partData.value.toIntOrNull()
+                        "publisher" -> publisher = partData.value
+                        "publicationYear" -> publicationYear = partData.value.toIntOrNull()
+                        "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                        "stock" -> stock = partData.value.toIntOrNull()
+                        "dimensions" -> dimensions = partData.value
+                        "weight" -> weight = partData.value.toDoubleOrNull()
+                        "language" -> language = partData.value
+                        "format" -> format = partData.value
+                        "edition" -> edition = partData.value
+                        "genre" -> genre = partData.value
+                        "publicationDate" -> publicationDate = partData.value
+                        "binding" -> binding = partData.value
+                        "tableOfContents" -> tableOfContents = partData.value
+                        "awards" -> awards = partData.value
+                        "contributors" -> contributors = partData.value
+                        "annotations" -> annotations = partData.value
+                        "tags" -> tags = partData.value
+                    }
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
+        try {
+            val book = db.insert(
+                title ?: return@post call.respondText("Title Missing", status = HttpStatusCode.BadRequest),
+                author ?: return@post call.respondText("Author Missing", status = HttpStatusCode.BadRequest),
+                description ?: return@post call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
+                price ?: return@post call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
+                category ?: return@post call.respondText("Category Missing", status = HttpStatusCode.BadRequest),
+                imageUrl ?: return@post call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
+                isbn ?: return@post call.respondText("ISBN Missing", status = HttpStatusCode.BadRequest),
+                pageCount ?: return@post call.respondText("Page Count Missing or Invalid", status = HttpStatusCode.BadRequest),
+                publisher ?: return@post call.respondText("Publisher Missing", status = HttpStatusCode.BadRequest),
+                publicationYear ?: return@post call.respondText("Publication Year Missing or Invalid", status = HttpStatusCode.BadRequest),
+                averageRating ?: return@post call.respondText("Average Rating Missing or Invalid", status = HttpStatusCode.BadRequest),
+                stock ?: return@post call.respondText("Stock Missing or Invalid", status = HttpStatusCode.BadRequest),
+                dimensions ?: return@post call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
+                weight ?: return@post call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
+                language ?: return@post call.respondText("Language Missing", status = HttpStatusCode.BadRequest),
+                format ?: return@post call.respondText("Format Missing", status = HttpStatusCode.BadRequest),
+                edition ?: return@post call.respondText("Edition Missing", status = HttpStatusCode.BadRequest),
+                genre ?: return@post call.respondText("Genre Missing", status = HttpStatusCode.BadRequest),
+                publicationDate ?: return@post call.respondText("Publication Date Missing", status = HttpStatusCode.BadRequest),
+                binding ?: return@post call.respondText("Binding Missing", status = HttpStatusCode.BadRequest),
+                tableOfContents ?: return@post call.respondText("Table of Contents Missing", status = HttpStatusCode.BadRequest),
+                awards ?: return@post call.respondText("Awards Missing", status = HttpStatusCode.BadRequest),
+                contributors ?: return@post call.respondText("Contributors Missing", status = HttpStatusCode.BadRequest),
+                annotations,
+                tags ?: return@post call.respondText("Tags Missing", status = HttpStatusCode.BadRequest)
+            )
+            book?.id?.let {
+                call.respond(
+                    status = HttpStatusCode.Created,
+                    "Book Created Successfully: $book"
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Creating Book: ${e.message}"
+            )
+        }
+    }
+
+    put("v1/books/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+        val multipart = call.receiveMultipart()
+        var title: String? = null
+        var author: String? = null
+        var description: String? = null
+        var price: Double? = null
+        var category: String? = null
+        var imageUrl: String? = null
+        var isbn: String? = null
+        var pageCount: Int? = null
+        var publisher: String? = null
+        var publicationYear: Int? = null
+        var averageRating: Double? = null
+        var stock: Int? = null
+        var dimensions: String? = null
+        var weight: Double? = null
+        var language: String? = null
+        var format: String? = null
+        var edition: String? = null
+        var genre: String? = null
+        var publicationDate: String? = null
+        var binding: String? = null
+        var tableOfContents: String? = null
+        var awards: String? = null
+        var contributors: String? = null
+        var annotations: String? = null
+        var tags: String? = null
+
+        val uploadDir = File("/upload/books/")
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs()
+        }
+
+        multipart.forEachPart { partData ->
+            when (partData) {
+                is PartData.FormItem -> {
+                    when (partData.name) {
+                        "title" -> title = partData.value
+                        "author" -> author = partData.value
+                        "description" -> description = partData.value
+                        "price" -> price = partData.value.toDoubleOrNull()
+                        "category" -> category = partData.value
+                        "imageUrl" -> imageUrl = partData.value
+                        "isbn" -> isbn = partData.value
+                        "pageCount" -> pageCount = partData.value.toIntOrNull()
+                        "publisher" -> publisher = partData.value
+                        "publicationYear" -> publicationYear = partData.value.toIntOrNull()
+                        "averageRating" -> averageRating = partData.value.toDoubleOrNull()
+                        "stock" -> stock = partData.value.toIntOrNull()
+                        "dimensions" -> dimensions = partData.value
+                        "weight" -> weight = partData.value.toDoubleOrNull()
+                        "language" -> language = partData.value
+                        "format" -> format = partData.value
+                        "edition" -> edition = partData.value
+                        "genre" -> genre = partData.value
+                        "publicationDate" -> publicationDate = partData.value
+                        "binding" -> binding = partData.value
+                        "tableOfContents" -> tableOfContents = partData.value
+                        "awards" -> awards = partData.value
+                        "contributors" -> contributors = partData.value
+                        "annotations" -> annotations = partData.value
+                        "tags" -> tags = partData.value
+                    }
+                }
+
+                is PartData.FileItem -> {
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
+                    val file = File("upload/books", fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().buffered().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    imageUrl = "/upload/books/${fileName}"
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
+        try {
+            val updatedCount = db.updateBookById(
+                id = id,
+                title = title ?: return@put call.respond(HttpStatusCode.BadRequest, "Title is required"),
+                author = author ?: return@put call.respond(HttpStatusCode.BadRequest, "Author is required"),
+                description = description ?: return@put call.respond(HttpStatusCode.BadRequest, "Description is required"),
+                price = price ?: return@put call.respond(HttpStatusCode.BadRequest, "Price is required"),
+                category = category ?: return@put call.respond(HttpStatusCode.BadRequest, "Category is required"),
+                imageUrl = imageUrl ?: return@put call.respond(HttpStatusCode.BadRequest, "Image URL is required"),
+                isbn = isbn ?: return@put call.respond(HttpStatusCode.BadRequest, "ISBN is required"),
+                pageCount = pageCount ?: return@put call.respond(HttpStatusCode.BadRequest, "Page count is required"),
+                publisher = publisher ?: return@put call.respond(HttpStatusCode.BadRequest, "Publisher is required"),
+                publicationYear = publicationYear ?: return@put call.respond(HttpStatusCode.BadRequest, "Publication year is required"),
+                averageRating = averageRating ?: return@put call.respond(HttpStatusCode.BadRequest, "Average rating is required"),
+                stock = stock ?: return@put call.respond(HttpStatusCode.BadRequest, "Stock is required"),
+                dimensions = dimensions ?: return@put call.respond(HttpStatusCode.BadRequest, "Dimensions is required"),
+                weight = weight ?: return@put call.respond(HttpStatusCode.BadRequest, "Weight is required"),
+                language = language ?: return@put call.respond(HttpStatusCode.BadRequest, "Language is required"),
+                format = format ?: return@put call.respond(HttpStatusCode.BadRequest, "Format is required"),
+                edition = edition ?: return@put call.respond(HttpStatusCode.BadRequest, "Edition is required"),
+                genre = genre ?: return@put call.respond(HttpStatusCode.BadRequest, "Genre is required"),
+                publicationDate = publicationDate ?: return@put call.respond(HttpStatusCode.BadRequest, "Publication date is required"),
+                binding = binding ?: return@put call.respond(HttpStatusCode.BadRequest, "Binding is required"),
+                tableOfContents = tableOfContents ?: return@put call.respond(HttpStatusCode.BadRequest, "Table of contents is required"),
+                awards = awards ?: return@put call.respond(HttpStatusCode.BadRequest, "Awards is required"),
+                contributors = contributors ?: return@put call.respond(HttpStatusCode.BadRequest, "Contributors is required"),
+                annotations = annotations,
+                tags = tags ?: return@put call.respond(HttpStatusCode.BadRequest, "Tags is required")
+            )
+
+            if (updatedCount != null && updatedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Book with ID $id updated successfully")
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Book with ID $id not found")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to update book: ${e.message}")
+        }
+    }
+
+
+    delete("v1/books/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+        try {
+            val deletedCount = db.deleteBookById(id)
+            if (deletedCount != null && deletedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Book with ID $id deleted successfully")
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Book with ID $id not found")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to delete book: ${e.message}")
+        }
+    }
+
+    get("v1/books/{id}") {
+        val id = call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+
+        try {
+            val book = db.getBookById(id)
+            if (book != null) {
+                call.respond(HttpStatusCode.OK, book)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Book with ID $id not found")
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve book: ${e.message}")
+        }
+    }
+
+    get("v1/books") {
+        try {
+            val books = db.getAllBooks()
+            if (books.isNullOrEmpty()) {
+                call.respond(HttpStatusCode.NotFound, "No books found")
+            } else {
+                call.respond(HttpStatusCode.OK, books)
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve books: ${e.message}")
+        }
+    }
+
 }
