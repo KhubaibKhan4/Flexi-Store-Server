@@ -999,22 +999,22 @@ fun Route.books(
         var annotations: String? = null
         var tags: String? = null
 
-        val uploadDir = File("/upload/books/")
-        if (!uploadDir.exists()) {
+        val uploadDir = File("upload/products/books")
+        if (!uploadDir.exists()){
             uploadDir.mkdirs()
         }
 
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
-                    val file = File("upload/books", fileName)
-                    partData.streamProvider().use { input ->
-                        file.outputStream().buffered().use { output ->
+                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
+                    val file = File(uploadDir,fileName)
+                    partData.streamProvider().use { input->
+                        file.outputStream().use { output->
                             input.copyTo(output)
                         }
                     }
-                    imageUrl = "/upload/books/$fileName"
+                    imageUrl = "/upload/products/books/$fileName"
                 }
 
                 is PartData.FormItem -> {
@@ -1125,8 +1125,8 @@ fun Route.books(
         var annotations: String? = null
         var tags: String? = null
 
-        val uploadDir = File("/upload/books/")
-        if (!uploadDir.exists()) {
+        val uploadDir = File("upload/products/promotions")
+        if (!uploadDir.exists()){
             uploadDir.mkdirs()
         }
 
@@ -1164,13 +1164,13 @@ fun Route.books(
 
                 is PartData.FileItem -> {
                     val fileName = partData.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
-                    val file = File("upload/books", fileName)
+                    val file = File("upload/products/promotions", fileName)
                     partData.streamProvider().use { input ->
                         file.outputStream().buffered().use { output ->
                             input.copyTo(output)
                         }
                     }
-                    imageUrl = "/upload/books/${fileName}"
+                    imageUrl = "/upload/products/promotions/${fileName}"
                 }
 
                 else -> {
