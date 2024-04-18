@@ -1,6 +1,7 @@
 package com.example.plugins
 
 import com.example.data.local.table.db.DatabaseFactory
+import com.example.domain.repository.books.BooksRepository
 import com.example.domain.repository.category.CategoryRepository
 import com.example.domain.repository.product.ProductRepository
 import com.example.domain.repository.promotion.PromotionRepository
@@ -15,6 +16,7 @@ fun Application.configureRouting() {
     val categoriesDb = CategoryRepository()
     val productsDb = ProductRepository()
     val promotionDb = PromotionRepository()
+    val booksDb = BooksRepository()
     routing {
         get("/") {
             call.respondText("Hello World!")
@@ -23,5 +25,6 @@ fun Application.configureRouting() {
         category(categoriesDb)
         products(productsDb)
         promotions(promotionDb)
+        books(booksDb)
     }
 }
