@@ -1,6 +1,7 @@
 package com.example.data.local.table.db
 
 import com.example.data.local.table.books.BooksTable
+import com.example.data.local.table.cart.CartTable
 import com.example.data.local.table.category.CategoryTable
 import com.example.data.local.table.product.ProductTable
 import com.example.data.local.table.promotion.PromotionTable
@@ -17,7 +18,7 @@ object DatabaseFactory {
     fun init() {
         Database.connect(hikari())
         transaction {
-            SchemaUtils.create(UserTable,CategoryTable, ProductTable,PromotionTable,BooksTable)
+            SchemaUtils.create(UserTable,CategoryTable, ProductTable,PromotionTable,BooksTable,CartTable)
         }
     }
 
