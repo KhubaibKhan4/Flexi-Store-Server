@@ -1,10 +1,12 @@
 package com.example.domain.repository.cart
 
 import com.example.data.local.table.cart.CartTable
+import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.repository.cart.CartDao
 import com.example.domain.model.cart.CartItem
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class CartRepository : CartDao {
@@ -25,7 +27,12 @@ class CartRepository : CartDao {
     }
 
     override suspend fun getAllCart(): List<CartItem>? {
-        TODO("Not yet implemented")
+        return DatabaseFactory.dbQuery {
+            CartTable.selectAll()
+                .mapNotNull {
+                    rowToResult(it)
+                }
+        }
     }
 
     override suspend fun getCartByUserId(id: Long): CartItem? {
