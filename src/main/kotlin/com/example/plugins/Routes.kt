@@ -1302,13 +1302,31 @@ fun Route.carts(
     }
 
     get("v1/cart") {
+        try {
+            val cartItems = db.getAllCart()
+            if (cartItems != null) {
+                call.respond(HttpStatusCode.OK, cartItems)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Cart Items Not Found for User ID: $cartItems"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Cart Items: ${e.message}"
+            )
+        }
+    }
+    get("v1/cart/{userId}") {
         val userId = call.parameters["userId"]?.toLongOrNull()
             ?: return@get call.respondText(
                 text = "User ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
         try {
-            val cartItems = db.getCartByUserId(userId)
+            val cartItems = db.getCartItemByUserId(userId)
             if (cartItems != null) {
                 call.respond(HttpStatusCode.OK, cartItems)
             } else {
@@ -1345,7 +1363,13 @@ fun Route.carts(
         }
     }
 
-    put("v1/cart") {
+    put("v1/cart/{userId}") {
+        val userId = call.parameters["userId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
         val parameters = call.receive<Parameters>()
         val productId = parameters["productId"]?.toLongOrNull()
             ?: return@put call.respondText(
@@ -1357,11 +1381,7 @@ fun Route.carts(
                 text = "Quantity Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
-        val userId = parameters["userId"]?.toLongOrNull()
-            ?: return@put call.respondText(
-                text = "User ID Missing or Invalid",
-                status = HttpStatusCode.BadRequest
-            )
+
         try {
             db.update(productId, quantity, userId)
             call.respond(HttpStatusCode.OK, "Cart item updated successfully")

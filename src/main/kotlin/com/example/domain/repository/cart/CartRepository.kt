@@ -43,6 +43,15 @@ class CartRepository : CartDao {
         }
     }
 
+    override suspend fun getCartItemByUserId(id: Long): CartItem? {
+        return DatabaseFactory.dbQuery {
+            CartTable.select(CartTable.userId.eq(id))
+                .map {
+                    rowToResult(it)
+                }.singleOrNull()
+        }
+    }
+
     override suspend fun deleteCartByUserId(id: Long): Int? {
         return DatabaseFactory.dbQuery {
             CartTable.deleteWhere { CartTable.userId.eq(id) }
