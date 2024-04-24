@@ -605,7 +605,8 @@ fun Route.products(
         }
     }
     get("v1/products/userId/{ids}") {
-        val ids = call.parameters["ids"]?.split(",")?.mapNotNull { it.toLongOrNull() }
+        val idsString = call.parameters["ids"]
+        val ids = idsString?.removeSurrounding("[", "]")?.split(",")?.mapNotNull { it.toLongOrNull() }
         if (ids.isNullOrEmpty()) {
             call.respond(HttpStatusCode.BadRequest, "Invalid IDs provided.")
             return@get
@@ -613,7 +614,7 @@ fun Route.products(
 
         try {
             val products = db.getProductsByIds(ids)
-            if (products?.isNotEmpty()==true) {
+            if (products?.isNotEmpty() == true) {
                 call.respond(HttpStatusCode.OK, products)
             } else {
                 call.respond(HttpStatusCode.NotFound, "No Products Found for the provided IDs.")
