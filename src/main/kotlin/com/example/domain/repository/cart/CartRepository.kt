@@ -50,7 +50,13 @@ class CartRepository : CartDao {
     }
 
     override suspend fun update(productId: Long, quantity: Int, userId: Long) {
-        TODO("Not yet implemented")
+       return DatabaseFactory.dbQuery {
+           CartTable.update({(CartTable.productId.eq(productId)) and (CartTable.userId eq userId)}){cart ->
+               cart[CartTable.productId] = productId
+               cart[CartTable.quality]= quantity
+               cart[CartTable.userId] = userId
+           }
+       }
     }
 
     private fun rowToResult(row: ResultRow): CartItem? {
