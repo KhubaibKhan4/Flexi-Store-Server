@@ -6,14 +6,14 @@ interface CartDao {
     suspend fun insert(
         productId: Long,
         quantity: Int,
-        product: Long
+        userId: Long
     ): CartItem?
     suspend fun getAllCart(): List<CartItem>?
-    suspend fun getCartById(id: Long): CartItem?
-    suspend fun deleteCartById(id:Long): Int?
+    suspend fun getCartByUserId(id: Long): CartItem?
+    suspend fun deleteCartByUserId(id:Long): Int?
     suspend fun update(
         productId: Long,
         quantity: Int,
-        product: Long
+        userId: Long
     )
 }
