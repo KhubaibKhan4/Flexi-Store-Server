@@ -16,8 +16,6 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.text.SimpleDateFormat
 
 fun Route.users(
@@ -242,7 +240,7 @@ fun Route.category(
         var isVisible: Boolean? = null
         var imageUrl: String? = null
         val uploadDir = File("upload/products/categories")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
 
@@ -387,7 +385,7 @@ fun Route.category(
         var isVisible: Boolean? = null
         var imageUrl: String? = null
         val uploadDir = File("upload/products/categories")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
 
@@ -477,7 +475,7 @@ fun Route.products(
         var averageRating: Double? = null
         var isFeature: Boolean? = null
         var manufacturer: String? = null
-        var colors : String? = null
+        var colors: String? = null
         val uploadDir = File("/upload/products/")
         if (!uploadDir.exists()) {
             uploadDir.mkdirs()
@@ -564,11 +562,11 @@ fun Route.products(
                     "isFeature Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 ),
-                manufacturer ?:return@post call.respondText(
+                manufacturer ?: return@post call.respondText(
                     "manufacturer Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 ),
-                colors ?:return@post call.respondText(
+                colors ?: return@post call.respondText(
                     "colors Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 )
@@ -606,27 +604,25 @@ fun Route.products(
             )
         }
     }
-    get("v1/products") {
-        val ids: List<Long>? = call.request.queryParameters.getAll("ids")?.mapNotNull { it.toLongOrNull() }
+    get("v1/products/userId/{ids}") {
+        val ids = call.parameters["ids"]?.split(",")?.mapNotNull { it.toLongOrNull() }
         if (ids.isNullOrEmpty()) {
-            call.respond(HttpStatusCode.BadRequest, "No product IDs provided.")
+            call.respond(HttpStatusCode.BadRequest, "Invalid IDs provided.")
             return@get
         }
 
         try {
             val products = db.getProductsByIds(ids)
-            if (products?.isNotEmpty() == true) {
+            if (products?.isNotEmpty()==true) {
                 call.respond(HttpStatusCode.OK, products)
             } else {
-                call.respond(HttpStatusCode.NotFound, "No products found with the provided IDs.")
+                call.respond(HttpStatusCode.NotFound, "No Products Found for the provided IDs.")
             }
         } catch (e: Exception) {
-            call.respond(
-                status = HttpStatusCode.InternalServerError,
-                "Error while fetching products: ${e.message}"
-            )
+            call.respond(HttpStatusCode.InternalServerError, "Error while fetching products: ${e.message}")
         }
     }
+
 
     get("v1/products/{id}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
@@ -701,7 +697,7 @@ fun Route.products(
         var averageRating: Double? = null
         var isFeature: Boolean? = null
         var manufacturer: String? = null
-        var colors : String? = null
+        var colors: String? = null
 
         multipart.forEachPart { partData ->
             when (partData) {
@@ -779,11 +775,11 @@ fun Route.products(
                     "isFeature Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 ),
-                manufacturer ?:return@put call.respondText(
+                manufacturer ?: return@put call.respondText(
                     "manufacturer Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 ),
-                colors ?:return@put call.respondText(
+                colors ?: return@put call.respondText(
                     "colors Missing or Invalid",
                     status = HttpStatusCode.BadRequest
                 )
@@ -824,7 +820,7 @@ fun Route.promotions(
         var endDate: Long? = null
         var enable: Boolean? = null
         val uploadDir = File("upload/products/promotions")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
         val dateFormat = SimpleDateFormat("MM/dd/yyyy")
@@ -832,10 +828,10 @@ fun Route.promotions(
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
-                    val file = File(uploadDir,fileName)
-                    partData.streamProvider().use { input->
-                        file.outputStream().use { output->
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "name/${System.currentTimeMillis()}"
+                    val file = File(uploadDir, fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().use { output ->
                             input.copyTo(output)
                         }
                     }
@@ -843,25 +839,26 @@ fun Route.promotions(
                 }
 
                 is PartData.FormItem -> {
-                    when(partData.name){
+                    when (partData.name) {
                         "title" -> title = partData.value
                         "description" -> description = partData.value
-                        "startDate" ->startDate= partData.value?.let { dateFormat.parse(it)?.time }
+                        "startDate" -> startDate = partData.value?.let { dateFormat.parse(it)?.time }
                         "endDate" -> endDate = partData.value?.let { dateFormat.parse(it)?.time }
                         "enable" -> enable = partData.value.toBoolean()
                     }
                 }
+
                 else -> {}
             }
         }
         try {
             val products = db.insert(
-                title  = title ?: return@post call.respond(HttpStatusCode.BadRequest, "Title Missing"),
+                title = title ?: return@post call.respond(HttpStatusCode.BadRequest, "Title Missing"),
                 description = description ?: return@post call.respond(HttpStatusCode.BadRequest, "Description Missing"),
                 imageUrl = imageUrl ?: return@post call.respond(HttpStatusCode.BadRequest, "Image File Missing"),
                 startDate = startDate ?: return@post call.respond(HttpStatusCode.BadRequest, "Start Date Missing"),
-                endDate = endDate ?: return@post call.respond(HttpStatusCode.BadRequest,"End Date Missing"),
-                enable = enable ?: return@post call.respond(HttpStatusCode.BadRequest,"Enabled Missing")
+                endDate = endDate ?: return@post call.respond(HttpStatusCode.BadRequest, "End Date Missing"),
+                enable = enable ?: return@post call.respond(HttpStatusCode.BadRequest, "Enabled Missing")
             )
             products.let {
                 call.respond(
@@ -870,7 +867,7 @@ fun Route.promotions(
                 )
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.Unauthorized,
                 "Error While Uploading Promotions Products : ${e.message}"
@@ -878,7 +875,8 @@ fun Route.promotions(
         }
     }
     delete("v1/promotions/{id}") {
-        val id = call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+        val id =
+            call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
         try {
             val deletedCount = db.deletePromotionById(id)
@@ -894,7 +892,7 @@ fun Route.promotions(
     get("v1/promotions") {
         try {
             val promotion = db.getPromotionsList()
-            if (promotion.isNullOrEmpty() ==true) {
+            if (promotion.isNullOrEmpty() == true) {
                 call.respond(HttpStatusCode.NotFound, "No Promotion Items Available inside the Database.dd ")
             } else {
                 call.respond(HttpStatusCode.OK, promotion)
@@ -904,7 +902,8 @@ fun Route.promotions(
         }
     }
     get("v1/promotions/{id}") {
-        val id = call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+        val id =
+            call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
         try {
             val promotion = db.getPromotionById(id)
@@ -917,7 +916,7 @@ fun Route.promotions(
             call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve promotion: ${e.message}")
         }
     }
-    put ("v1/promotions/{id}"){
+    put("v1/promotions/{id}") {
         val id = call.parameters["id"] ?: return@put call.respond(
             HttpStatusCode.BadRequest,
             "Id Missing"
@@ -930,7 +929,7 @@ fun Route.promotions(
         var endDate: Long? = null
         var enable: Boolean? = null
         val uploadDir = File("upload/products/promotions")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
         val dateFormat = SimpleDateFormat("MM/dd/yyyy")
@@ -938,10 +937,10 @@ fun Route.promotions(
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
-                    val file = File(uploadDir,fileName)
-                    partData.streamProvider().use { input->
-                        file.outputStream().use { output->
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "name/${System.currentTimeMillis()}"
+                    val file = File(uploadDir, fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().use { output ->
                             input.copyTo(output)
                         }
                     }
@@ -949,26 +948,27 @@ fun Route.promotions(
                 }
 
                 is PartData.FormItem -> {
-                    when(partData.name){
+                    when (partData.name) {
                         "title" -> title = partData.value
                         "description" -> description = partData.value
-                        "startDate" ->startDate= partData.value?.let { dateFormat.parse(it)?.time }
+                        "startDate" -> startDate = partData.value?.let { dateFormat.parse(it)?.time }
                         "endDate" -> endDate = partData.value?.let { dateFormat.parse(it)?.time }
                         "enable" -> enable = partData.value.toBoolean()
                     }
                 }
+
                 else -> {}
             }
         }
         try {
             val products = db.updatePromotion(
                 id = id.toLong(),
-                title  = title ?: return@put call.respond(HttpStatusCode.BadRequest, "Title Missing"),
+                title = title ?: return@put call.respond(HttpStatusCode.BadRequest, "Title Missing"),
                 description = description ?: return@put call.respond(HttpStatusCode.BadRequest, "Description Missing"),
                 imageUrl = imageUrl ?: return@put call.respond(HttpStatusCode.BadRequest, "Image File Missing"),
                 startDate = startDate ?: return@put call.respond(HttpStatusCode.BadRequest, "Start Date Missing"),
-                endDate = endDate ?: return@put call.respond(HttpStatusCode.BadRequest,"End Date Missing"),
-                enable = enable ?: return@put call.respond(HttpStatusCode.BadRequest,"Enabled Missing")
+                endDate = endDate ?: return@put call.respond(HttpStatusCode.BadRequest, "End Date Missing"),
+                enable = enable ?: return@put call.respond(HttpStatusCode.BadRequest, "Enabled Missing")
             )
             if (products != null) {
                 call.respond(
@@ -982,7 +982,7 @@ fun Route.promotions(
                 )
             }
 
-        }catch (e: Exception){
+        } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.Unauthorized,
                 "Error While Uploading Promotions Products : ${e.message}"
@@ -990,9 +990,10 @@ fun Route.promotions(
         }
     }
 }
+
 fun Route.books(
     db: BooksRepository
-){
+) {
     post("v1/books") {
         val multipart = call.receiveMultipart()
         var title: String? = null
@@ -1022,17 +1023,17 @@ fun Route.books(
         var tags: String? = null
 
         val uploadDir = File("upload/products/books")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
 
         multipart.forEachPart { partData ->
             when (partData) {
                 is PartData.FileItem -> {
-                    val fileName = partData.originalFileName?.replace(" ","_") ?: "name/${System.currentTimeMillis()}"
-                    val file = File(uploadDir,fileName)
-                    partData.streamProvider().use { input->
-                        file.outputStream().use { output->
+                    val fileName = partData.originalFileName?.replace(" ", "_") ?: "name/${System.currentTimeMillis()}"
+                    val file = File(uploadDir, fileName)
+                    partData.streamProvider().use { input ->
+                        file.outputStream().use { output ->
                             input.copyTo(output)
                         }
                     }
@@ -1083,10 +1084,19 @@ fun Route.books(
                 category ?: return@post call.respondText("Category Missing", status = HttpStatusCode.BadRequest),
                 imageUrl ?: return@post call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
                 isbn ?: return@post call.respondText("ISBN Missing", status = HttpStatusCode.BadRequest),
-                pageCount ?: return@post call.respondText("Page Count Missing or Invalid", status = HttpStatusCode.BadRequest),
+                pageCount ?: return@post call.respondText(
+                    "Page Count Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 publisher ?: return@post call.respondText("Publisher Missing", status = HttpStatusCode.BadRequest),
-                publicationYear ?: return@post call.respondText("Publication Year Missing or Invalid", status = HttpStatusCode.BadRequest),
-                averageRating ?: return@post call.respondText("Average Rating Missing or Invalid", status = HttpStatusCode.BadRequest),
+                publicationYear ?: return@post call.respondText(
+                    "Publication Year Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
+                averageRating ?: return@post call.respondText(
+                    "Average Rating Missing or Invalid",
+                    status = HttpStatusCode.BadRequest
+                ),
                 stock ?: return@post call.respondText("Stock Missing or Invalid", status = HttpStatusCode.BadRequest),
                 dimensions ?: return@post call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
                 weight ?: return@post call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
@@ -1094,11 +1104,20 @@ fun Route.books(
                 format ?: return@post call.respondText("Format Missing", status = HttpStatusCode.BadRequest),
                 edition ?: return@post call.respondText("Edition Missing", status = HttpStatusCode.BadRequest),
                 genre ?: return@post call.respondText("Genre Missing", status = HttpStatusCode.BadRequest),
-                publicationDate ?: return@post call.respondText("Publication Date Missing", status = HttpStatusCode.BadRequest),
+                publicationDate ?: return@post call.respondText(
+                    "Publication Date Missing",
+                    status = HttpStatusCode.BadRequest
+                ),
                 binding ?: return@post call.respondText("Binding Missing", status = HttpStatusCode.BadRequest),
-                tableOfContents ?: return@post call.respondText("Table of Contents Missing", status = HttpStatusCode.BadRequest),
+                tableOfContents ?: return@post call.respondText(
+                    "Table of Contents Missing",
+                    status = HttpStatusCode.BadRequest
+                ),
                 awards ?: return@post call.respondText("Awards Missing", status = HttpStatusCode.BadRequest),
-                contributors ?: return@post call.respondText("Contributors Missing", status = HttpStatusCode.BadRequest),
+                contributors ?: return@post call.respondText(
+                    "Contributors Missing",
+                    status = HttpStatusCode.BadRequest
+                ),
                 annotations,
                 tags ?: return@post call.respondText("Tags Missing", status = HttpStatusCode.BadRequest)
             )
@@ -1118,7 +1137,8 @@ fun Route.books(
     }
 
     put("v1/books/{id}") {
-        val id = call.parameters["id"]?.toLongOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+        val id =
+            call.parameters["id"]?.toLongOrNull() ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
         val multipart = call.receiveMultipart()
         var title: String? = null
@@ -1148,7 +1168,7 @@ fun Route.books(
         var tags: String? = null
 
         val uploadDir = File("upload/products/promotions")
-        if (!uploadDir.exists()){
+        if (!uploadDir.exists()) {
             uploadDir.mkdirs()
         }
 
@@ -1206,15 +1226,24 @@ fun Route.books(
                 id = id,
                 title = title ?: return@put call.respond(HttpStatusCode.BadRequest, "Title is required"),
                 author = author ?: return@put call.respond(HttpStatusCode.BadRequest, "Author is required"),
-                description = description ?: return@put call.respond(HttpStatusCode.BadRequest, "Description is required"),
+                description = description ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Description is required"
+                ),
                 price = price ?: return@put call.respond(HttpStatusCode.BadRequest, "Price is required"),
                 category = category ?: return@put call.respond(HttpStatusCode.BadRequest, "Category is required"),
                 imageUrl = imageUrl ?: return@put call.respond(HttpStatusCode.BadRequest, "Image URL is required"),
                 isbn = isbn ?: return@put call.respond(HttpStatusCode.BadRequest, "ISBN is required"),
                 pageCount = pageCount ?: return@put call.respond(HttpStatusCode.BadRequest, "Page count is required"),
                 publisher = publisher ?: return@put call.respond(HttpStatusCode.BadRequest, "Publisher is required"),
-                publicationYear = publicationYear ?: return@put call.respond(HttpStatusCode.BadRequest, "Publication year is required"),
-                averageRating = averageRating ?: return@put call.respond(HttpStatusCode.BadRequest, "Average rating is required"),
+                publicationYear = publicationYear ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Publication year is required"
+                ),
+                averageRating = averageRating ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Average rating is required"
+                ),
                 stock = stock ?: return@put call.respond(HttpStatusCode.BadRequest, "Stock is required"),
                 dimensions = dimensions ?: return@put call.respond(HttpStatusCode.BadRequest, "Dimensions is required"),
                 weight = weight ?: return@put call.respond(HttpStatusCode.BadRequest, "Weight is required"),
@@ -1222,11 +1251,20 @@ fun Route.books(
                 format = format ?: return@put call.respond(HttpStatusCode.BadRequest, "Format is required"),
                 edition = edition ?: return@put call.respond(HttpStatusCode.BadRequest, "Edition is required"),
                 genre = genre ?: return@put call.respond(HttpStatusCode.BadRequest, "Genre is required"),
-                publicationDate = publicationDate ?: return@put call.respond(HttpStatusCode.BadRequest, "Publication date is required"),
+                publicationDate = publicationDate ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Publication date is required"
+                ),
                 binding = binding ?: return@put call.respond(HttpStatusCode.BadRequest, "Binding is required"),
-                tableOfContents = tableOfContents ?: return@put call.respond(HttpStatusCode.BadRequest, "Table of contents is required"),
+                tableOfContents = tableOfContents ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Table of contents is required"
+                ),
                 awards = awards ?: return@put call.respond(HttpStatusCode.BadRequest, "Awards is required"),
-                contributors = contributors ?: return@put call.respond(HttpStatusCode.BadRequest, "Contributors is required"),
+                contributors = contributors ?: return@put call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Contributors is required"
+                ),
                 annotations = annotations,
                 tags = tags ?: return@put call.respond(HttpStatusCode.BadRequest, "Tags is required")
             )
@@ -1243,7 +1281,8 @@ fun Route.books(
 
 
     delete("v1/books/{id}") {
-        val id = call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+        val id =
+            call.parameters["id"]?.toLongOrNull() ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
         try {
             val deletedCount = db.deleteBookById(id)
@@ -1258,7 +1297,8 @@ fun Route.books(
     }
 
     get("v1/books/{id}") {
-        val id = call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
+        val id =
+            call.parameters["id"]?.toLongOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid ID")
 
         try {
             val book = db.getBookById(id)
@@ -1286,6 +1326,7 @@ fun Route.books(
     }
 
 }
+
 fun Route.carts(
     db: CartRepository,
 ) {
