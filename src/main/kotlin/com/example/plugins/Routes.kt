@@ -2,6 +2,7 @@ package com.example.plugins
 
 import com.example.domain.model.login.LoginResponse
 import com.example.domain.repository.books.BooksRepository
+import com.example.domain.repository.cart.CartRepository
 import com.example.domain.repository.category.CategoryRepository
 import com.example.domain.repository.product.ProductRepository
 import com.example.domain.repository.promotion.PromotionRepository
@@ -1263,4 +1264,112 @@ fun Route.books(
         }
     }
 
+}
+fun Route.carts(
+    db: CartRepository
+) {
+    post("v1/cart") {
+        val parameters = call.receive<Parameters>()
+        val productId = parameters["productId"]?.toLongOrNull()
+            ?: return@post call.respondText(
+                text = "Product ID Missing",
+                status = HttpStatusCode.BadRequest
+            )
+        val quantity = parameters["quantity"]?.toIntOrNull()
+            ?: return@post call.respondText(
+                text = "Quantity Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val userId = parameters["userId"]?.toLongOrNull()
+            ?: return@post call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val cartItem = db.insert(productId, quantity, userId)
+            cartItem.let {
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    cartItem ?: "Error while adding item to cart"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Adding Item to Cart: ${e.message}"
+            )
+        }
+    }
+
+    get("v1/cart") {
+        val userId = call.parameters["userId"]?.toLongOrNull()
+            ?: return@get call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val cartItems = db.getCartByUserId(userId)
+            if (cartItems != null) {
+                call.respond(HttpStatusCode.OK, cartItems)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Cart Items Not Found for User ID: $userId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Cart Items: ${e.message}"
+            )
+        }
+    }
+
+    delete("v1/cart/{userId}") {
+        val userId = call.parameters["userId"]?.toLongOrNull()
+            ?: return@delete call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val deletedItemsCount = db.deleteCartByUserId(userId)
+            call.respond(
+                status = HttpStatusCode.OK,
+                "Deleted $deletedItemsCount items from cart for user ID: $userId"
+            )
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Deleting Cart Items: ${e.message}"
+            )
+        }
+    }
+
+    put("v1/cart") {
+        val parameters = call.receive<Parameters>()
+        val productId = parameters["productId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "Product ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val quantity = parameters["quantity"]?.toIntOrNull()
+            ?: return@put call.respondText(
+                text = "Quantity Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val userId = parameters["userId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            db.update(productId, quantity, userId)
+            call.respond(HttpStatusCode.OK, "Cart item updated successfully")
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Updating Cart Item: ${e.message}"
+            )
+        }
+    }
 }
