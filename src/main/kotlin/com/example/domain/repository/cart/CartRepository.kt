@@ -4,10 +4,24 @@ import com.example.data.local.table.cart.CartTable
 import com.example.data.repository.cart.CartDao
 import com.example.domain.model.cart.CartItem
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.transactions.transaction
 
 class CartRepository : CartDao {
     override suspend fun insert(productId: Long, quantity: Int, userId: Long): CartItem? {
-        TODO("Not yet implemented")
+        return try {
+            transaction {
+                val statement = CartTable.insert { cart ->
+                    cart[CartTable.productId] = productId
+                    cart[CartTable.quality] = quantity
+                    cart[CartTable.userId] = userId
+                }
+                val firstResult = statement.resultedValues?.firstOrNull()!!
+                rowToResult(firstResult)
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override suspend fun getAllCart(): List<CartItem>? {
