@@ -606,6 +606,27 @@ fun Route.products(
             )
         }
     }
+    get("v1/products") {
+        val ids: List<Long>? = call.request.queryParameters.getAll("ids")?.mapNotNull { it.toLongOrNull() }
+        if (ids.isNullOrEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, "No product IDs provided.")
+            return@get
+        }
+
+        try {
+            val products = db.getProductsByIds(ids)
+            if (products?.isNotEmpty() == true) {
+                call.respond(HttpStatusCode.OK, products)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "No products found with the provided IDs.")
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error while fetching products: ${e.message}"
+            )
+        }
+    }
 
     get("v1/products/{id}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
@@ -1266,7 +1287,7 @@ fun Route.books(
 
 }
 fun Route.carts(
-    db: CartRepository
+    db: CartRepository,
 ) {
     post("v1/cart") {
         val parameters = call.receive<Parameters>()

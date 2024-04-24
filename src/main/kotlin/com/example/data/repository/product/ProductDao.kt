@@ -25,6 +25,7 @@ interface ProductDao {
         colors: String
     ): Product?
 
+    suspend fun getProductsByIds(ids: List<Long>): List<Product>?
     suspend fun getAllProducts(): List<Product>?
     suspend fun getProductById(id: Long): Product?
     suspend fun deleteProductById(id: Long): Int?
