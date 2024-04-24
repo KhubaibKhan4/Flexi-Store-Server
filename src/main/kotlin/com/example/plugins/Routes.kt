@@ -1319,6 +1319,29 @@ fun Route.carts(
             )
         }
     }
+    get("v1/cart/user/{userId}") {
+        val userId = call.parameters["userId"]?.toLongOrNull()
+            ?: return@get call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val cartItems = db.getCartByUserId(userId)
+            if (cartItems != null) {
+                call.respond(HttpStatusCode.OK, cartItems)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Cart Items Not Found for User ID: $userId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Cart Items: ${e.message}"
+            )
+        }
+    }
     get("v1/cart/{userId}") {
         val userId = call.parameters["userId"]?.toLongOrNull()
             ?: return@get call.respondText(
