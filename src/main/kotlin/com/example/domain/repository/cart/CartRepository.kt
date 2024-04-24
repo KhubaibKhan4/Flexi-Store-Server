@@ -5,7 +5,9 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.repository.cart.CartDao
 import com.example.domain.model.cart.CartItem
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -35,8 +37,13 @@ class CartRepository : CartDao {
         }
     }
 
-    override suspend fun getCartByUserId(id: Long): CartItem? {
-        TODO("Not yet implemented")
+    override suspend fun getCartByUserId(id: Long): List<CartItem>? {
+        return DatabaseFactory.dbQuery {
+            CartTable.select(CartTable.userId.eq(id))
+                .mapNotNull {
+                rowToResult(it)
+            }
+        }
     }
 
     override suspend fun deleteCartByUserId(id: Long): Int? {
