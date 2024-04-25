@@ -7,7 +7,6 @@ import com.example.domain.model.cart.CartItem
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import javax.xml.crypto.Data
 
 class CartRepository : CartDao {
     override suspend fun insert(productId: Long, quantity: Int, userId: Long): CartItem? {
@@ -15,7 +14,7 @@ class CartRepository : CartDao {
             transaction {
                 val statement = CartTable.insert { cart ->
                     cart[CartTable.productId] = productId
-                    cart[CartTable.quality] = quantity
+                    cart[CartTable.quantity] = quantity
                     cart[CartTable.userId] = userId
                 }
                 val firstResult = statement.resultedValues?.firstOrNull()!!
@@ -79,10 +78,21 @@ class CartRepository : CartDao {
            CartTable.update({(CartTable.productId.eq(productId)) and (CartTable.userId eq userId)}){cart ->
                cart[CartTable.cartId] = cartId
                cart[CartTable.productId] = productId
-               cart[CartTable.quality]= quantity
+               cart[CartTable.quantity]= quantity
                cart[CartTable.userId] = userId
            }
        }
+    }
+
+    override suspend fun updateCartItem(cartId: Long, productId: Long, quantity: Int, userId: Long) {
+        return DatabaseFactory.dbQuery {
+            CartTable.update({CartTable.cartId eq cartId}){cart ->
+                cart[CartTable.cartId] = cartId
+                cart[CartTable.productId] = productId
+                cart[CartTable.quantity] = quantity
+                cart[CartTable.userId] = userId
+            }
+        }
     }
 
     private fun rowToResult(row: ResultRow): CartItem? {
@@ -92,7 +102,7 @@ class CartRepository : CartDao {
             return CartItem(
                 cartId = row[CartTable.cartId],
                 productId = row[CartTable.productId],
-                quantity = row[CartTable.quality],
+                quantity = row[CartTable.quantity],
                 userId = row[CartTable.userId]
             )
         }

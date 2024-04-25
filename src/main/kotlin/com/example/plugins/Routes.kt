@@ -1457,6 +1457,11 @@ fun Route.carts(
             )
 
         val parameters = call.receive<Parameters>()
+        val cartId = parameters["cartId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "cart ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
         val productId = parameters["productId"]?.toLongOrNull()
             ?: return@put call.respondText(
                 text = "Product ID Missing or Invalid",
@@ -1468,8 +1473,94 @@ fun Route.carts(
                 status = HttpStatusCode.BadRequest
             )
 
+
         try {
-            db.update(productId, quantity, userId)
+            db.update(cartId, productId, quantity, userId)
+            call.respond(HttpStatusCode.OK, "Cart item updated successfully")
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Updating Cart Item: ${e.message}"
+            )
+        }
+    }
+    get("v1/cart/{cartId}") {
+        val cartId = call.parameters["cartId"]?.toLongOrNull()
+            ?: return@get call.respondText(
+                text = "Cart ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val cartItem = db.getCartItemByCartId(cartId)
+            if (cartItem != null) {
+                call.respond(HttpStatusCode.OK, cartItem)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Cart Item Not Found for Cart ID: $cartId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Cart Item: ${e.message}"
+            )
+        }
+    }
+
+    delete("v1/cart/item/{cartId}") {
+        val cartId = call.parameters["cartId"]?.toLongOrNull()
+            ?: return@delete call.respondText(
+                text = "Cart ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        try {
+            val deletedItemsCount = db.deleteCartItemByCartId(cartId)
+            if (deletedItemsCount != null) {
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "Deleted $deletedItemsCount items from cart with ID: $cartId"
+                )
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Cart Item Not Found for Cart ID: $cartId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Deleting Cart Item: ${e.message}"
+            )
+        }
+    }
+
+    put("v1/cart/item/{cartId}") {
+        val cartId = call.parameters["cartId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "Cart ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
+        val parameters = call.receive<Parameters>()
+        val productId = parameters["productId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "Product ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val quantity = parameters["quantity"]?.toIntOrNull()
+            ?: return@put call.respondText(
+                text = "Quantity Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val userId = parameters["userId"]?.toIntOrNull()
+            ?: return@put call.respondText(
+                text = "userId Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
+        try {
+            db.updateCartItem(cartId, productId, quantity,userId.toLong())
             call.respond(HttpStatusCode.OK, "Cart item updated successfully")
         } catch (e: Exception) {
             call.respond(

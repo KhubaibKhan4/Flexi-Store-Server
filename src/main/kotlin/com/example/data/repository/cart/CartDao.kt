@@ -20,4 +20,10 @@ interface CartDao {
         quantity: Int,
         userId: Long
     )
+    suspend fun updateCartItem(
+        cartId: Long,
+        productId: Long,
+        quantity: Int,
+        userId: Long
+    )
 }
