@@ -1457,7 +1457,7 @@ fun Route.carts(
             )
 
         val parameters = call.receive<Parameters>()
-        val cartId = parameters["cartId"]?.toLongOrNull()
+        val cartId = parameters["cartId"]?.toIntOrNull()
             ?: return@put call.respondText(
                 text = "cart ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
@@ -1484,8 +1484,8 @@ fun Route.carts(
             )
         }
     }
-    get("v1/cart/{cartId}") {
-        val cartId = call.parameters["cartId"]?.toLongOrNull()
+    get("v1/cart/cartId/{cartId}") {
+        val cartId = call.parameters["cartId"]?.toIntOrNull()
             ?: return@get call.respondText(
                 text = "Cart ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
@@ -1509,13 +1509,13 @@ fun Route.carts(
     }
 
     delete("v1/cart/item/{cartId}") {
-        val cartId = call.parameters["cartId"]?.toLongOrNull()
+        val cartId = call.parameters["cartId"]
             ?: return@delete call.respondText(
                 text = "Cart ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
         try {
-            val deletedItemsCount = db.deleteCartItemByCartId(cartId)
+            val deletedItemsCount = db.deleteCartItemByCartId(cartId.toInt())
             if (deletedItemsCount != null) {
                 call.respond(
                     status = HttpStatusCode.OK,
@@ -1536,7 +1536,7 @@ fun Route.carts(
     }
 
     put("v1/cart/item/{cartId}") {
-        val cartId = call.parameters["cartId"]?.toLongOrNull()
+        val cartId = call.parameters["cartId"]?.toIntOrNull()
             ?: return@put call.respondText(
                 text = "Cart ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest

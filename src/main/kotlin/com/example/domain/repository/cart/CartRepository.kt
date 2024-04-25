@@ -52,7 +52,7 @@ class CartRepository : CartDao {
         }
     }
 
-    override suspend fun getCartItemByCartId(id: Long): CartItem? {
+    override suspend fun getCartItemByCartId(id: Int): CartItem? {
         return DatabaseFactory.dbQuery {
             CartTable.select(CartTable.cartId eq id)
                 .map {
@@ -61,7 +61,7 @@ class CartRepository : CartDao {
         }
     }
 
-    override suspend fun deleteCartItemByCartId(id: Long): Int? {
+    override suspend fun deleteCartItemByCartId(id: Int): Int? {
         return DatabaseFactory.dbQuery {
             CartTable.deleteWhere { CartTable.cartId.eq(id) }
         }
@@ -73,7 +73,7 @@ class CartRepository : CartDao {
         }
     }
 
-    override suspend fun update(cartId: Long,productId: Long, quantity: Int, userId: Long) {
+    override suspend fun update(cartId: Int,productId: Long, quantity: Int, userId: Long) {
        return DatabaseFactory.dbQuery {
            CartTable.update({(CartTable.productId.eq(productId)) and (CartTable.userId eq userId)}){cart ->
                cart[CartTable.cartId] = cartId
@@ -84,7 +84,7 @@ class CartRepository : CartDao {
        }
     }
 
-    override suspend fun updateCartItem(cartId: Long, productId: Long, quantity: Int, userId: Long) {
+    override suspend fun updateCartItem(cartId: Int, productId: Long, quantity: Int, userId: Long) {
         return DatabaseFactory.dbQuery {
             CartTable.update({CartTable.cartId eq cartId}){cart ->
                 cart[CartTable.cartId] = cartId
