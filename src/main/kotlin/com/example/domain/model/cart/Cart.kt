@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CartItem(
+    val cartId: Long,
     val productId: Long,
     val quantity: Int,
     val userId: Long
