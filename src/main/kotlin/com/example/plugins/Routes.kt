@@ -1516,7 +1516,7 @@ fun Route.carts(
             )
         try {
             val deletedItemsCount = db.deleteCartItemByCartId(cartId.toInt())
-            if (deletedItemsCount != null) {
+            if (deletedItemsCount == 1) {
                 call.respond(
                     status = HttpStatusCode.OK,
                     "Deleted $deletedItemsCount items from cart with ID: $cartId"
