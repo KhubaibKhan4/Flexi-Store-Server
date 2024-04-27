@@ -135,6 +135,22 @@ class UsersRepository : UsersDao {
             }
         }
 
+    override suspend fun updateAddress(
+        id: Long,
+        address: String,
+        city: String,
+        country: String,
+        postalCode: Long
+    ): Int =
+        DatabaseFactory.dbQuery {
+            UserTable.update({ UserTable.id.eq(id) }) { user ->
+                user[UserTable.address] = address
+                user[UserTable.city] = city
+                user[UserTable.country] = country
+                user[UserTable.postalCode] = postalCode
+            }
+        }
+
     private val jwtVerifier : JWTVerifier = JWT.require(Algorithm.HMAC256(jwtSecret))
         .withAudience(jwtAudience)
         .withIssuer(jwtIssuer)

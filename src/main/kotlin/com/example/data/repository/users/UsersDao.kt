@@ -35,4 +35,11 @@ interface UsersDao {
         country: String,
         phoneNumber: String,
     ): Int
+    suspend fun updateAddress(
+        id: Long,
+        address: String,
+        city: String,
+        country: String,
+        postalCode: Long
+    ): Int
 }

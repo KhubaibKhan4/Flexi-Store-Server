@@ -193,15 +193,15 @@ fun Route.users(
             status = HttpStatusCode.BadRequest
         )
         val address = parameters["address"] ?: return@put call.respondText(
-            text = "fullName Missing",
+            text = "address Missing",
             status = HttpStatusCode.BadRequest
         )
         val city = parameters["city"] ?: return@put call.respondText(
-            text = "fullName Missing",
+            text = "city Missing",
             status = HttpStatusCode.BadRequest
         )
         val country = parameters["country"] ?: return@put call.respondText(
-            text = "fullName Missing",
+            text = "country Missing",
             status = HttpStatusCode.BadRequest
         )
         val postalCode = parameters["postalCode"]?.toLongOrNull() ?: return@put call.respondText(
@@ -209,12 +209,59 @@ fun Route.users(
             status = HttpStatusCode.Unauthorized
         )
         val phoneNumber = parameters["phoneNumber"] ?: return@put call.respondText(
-            text = "fullName Missing",
+            text = "phoneNumber Missing",
             status = HttpStatusCode.BadRequest
         )
         try {
             val result = id.toLong().let { userId ->
                 db.updateUsers(userId, username, email, password, fullName, address, city,postalCode, country, phoneNumber)
+            }
+            if (result == 1) {
+                call.respondText(
+                    text = "Update Successfully...",
+                    status = HttpStatusCode.OK
+                )
+            } else {
+                call.respondText(
+                    "Something Went Wrong...",
+                    status = HttpStatusCode.BadRequest
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respondText(
+                text = e.message.toString(),
+                status = HttpStatusCode.BadRequest
+            )
+        }
+    }
+    put("v1/users/address/{id}") {
+        val id = call.parameters["id"] ?: return@put call.respondText(
+            text = "Id Not Found",
+            status = HttpStatusCode.NotFound
+        )
+        val parameters = call.receive<Parameters>()
+
+        val address = parameters["address"] ?: return@put call.respondText(
+            text = "address Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val city = parameters["city"] ?: return@put call.respondText(
+            text = "city Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val country = parameters["country"] ?: return@put call.respondText(
+            text = "country Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val postalCode = parameters["postalCode"]?.toLongOrNull() ?: return@put call.respondText(
+            text = "postalCode Missing",
+            status = HttpStatusCode.Unauthorized
+        )
+
+        try {
+            val result = id.toLong().let { userId ->
+                db.updateAddress(userId, address, city, country, postalCode)
             }
             if (result == 1) {
                 call.respondText(
