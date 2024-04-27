@@ -12,6 +12,7 @@ data class Users(
     val address: String,
     val city: String,
     val country: String,
+    val postalCode: Long,
     val phoneNumber: String,
     val userRole: String
 )

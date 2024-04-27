@@ -10,6 +10,7 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.data.local.table.user.UserTable
 import com.example.data.repository.users.UsersDao
 import com.example.domain.model.user.Users
+import org.h2.engine.User
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.statements.InsertStatement
@@ -35,6 +36,7 @@ class UsersRepository : UsersDao {
                 address = row[UserTable.address],
                 city = row[UserTable.city],
                 country = row[UserTable.country],
+                postalCode = row[UserTable.postalCode],
                 phoneNumber = row[UserTable.phoneNumber],
                 userRole = row[UserTable.userRole]
             )
@@ -50,6 +52,7 @@ class UsersRepository : UsersDao {
         address: String,
         city: String,
         country: String,
+        postalCode: Long,
         phoneNumber: String,
         userRole: String
     ): Users? {
@@ -63,6 +66,7 @@ class UsersRepository : UsersDao {
                 users[UserTable.address] = address
                 users[UserTable.city] = city
                 users[UserTable.country] = country
+                users[UserTable.postalCode] = postalCode
                 users[UserTable.phoneNumber] = phoneNumber
                 users[UserTable.userRole] = userRole
             }
@@ -112,6 +116,7 @@ class UsersRepository : UsersDao {
         fullName: String,
         address: String,
         city: String,
+        postalCode: Long,
         country: String,
         phoneNumber: String
     ): Int =
@@ -125,6 +130,7 @@ class UsersRepository : UsersDao {
                 user[UserTable.address] = address
                 user[UserTable.city] = city
                 user[UserTable.country]= country
+                user[UserTable.postalCode] = postalCode
                 user[UserTable.phoneNumber] = phoneNumber
             }
         }

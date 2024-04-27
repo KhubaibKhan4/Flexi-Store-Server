@@ -11,6 +11,7 @@ interface UsersDao {
         address: String,
         city: String,
         country: String,
+        postalCode: Long,
         phoneNumber: String,
         userRole: String
     ): Users?
@@ -30,6 +31,7 @@ interface UsersDao {
         fullName: String,
         address: String,
         city: String,
+        postalCode: Long,
         country: String,
         phoneNumber: String,
     ): Int

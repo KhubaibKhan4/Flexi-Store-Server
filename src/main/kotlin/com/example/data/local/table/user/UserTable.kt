@@ -12,6 +12,7 @@ object UserTable : Table("Users") {
     val address: Column<String> = varchar("address", length = 150)
     val city: Column<String> = varchar("city", length = 75)
     val country: Column<String> = varchar("country", length = 100)
+    val postalCode: Column<Long> = long("postal_code")
     val phoneNumber: Column<String> = varchar("phoneNumber", length = 130)
     val userRole: Column<String> = varchar("userRole", length = 51)
 

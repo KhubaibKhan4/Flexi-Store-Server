@@ -51,6 +51,10 @@ fun Route.users(
             text = "Country Missing",
             status = HttpStatusCode.Unauthorized
         )
+        val postalCode = parameters["postalCode"]?.toLongOrNull() ?: return@post call.respondText(
+            text = "postalCode Missing",
+            status = HttpStatusCode.Unauthorized
+        )
         val phoneNumber = parameters["phoneNumber"] ?: return@post call.respondText(
             text = "phoneNumber Missing",
             status = HttpStatusCode.Unauthorized
@@ -60,7 +64,7 @@ fun Route.users(
             status = HttpStatusCode.Unauthorized
         )
         try {
-            val users = db.insert(userName, email, password, fullName, address, city, country, phoneNumber, userRole)
+            val users = db.insert(userName, email, password, fullName, address, city, country,postalCode, phoneNumber, userRole)
             users?.id.let {
                 call.respond(
                     status = HttpStatusCode.OK,
@@ -200,13 +204,17 @@ fun Route.users(
             text = "fullName Missing",
             status = HttpStatusCode.BadRequest
         )
+        val postalCode = parameters["postalCode"]?.toLongOrNull() ?: return@put call.respondText(
+            text = "postalCode Missing",
+            status = HttpStatusCode.Unauthorized
+        )
         val phoneNumber = parameters["phoneNumber"] ?: return@put call.respondText(
             text = "fullName Missing",
             status = HttpStatusCode.BadRequest
         )
         try {
             val result = id.toLong().let { userId ->
-                db.updateUsers(userId, username, email, password, fullName, address, city, country, phoneNumber)
+                db.updateUsers(userId, username, email, password, fullName, address, city,postalCode, country, phoneNumber)
             }
             if (result == 1) {
                 call.respondText(
