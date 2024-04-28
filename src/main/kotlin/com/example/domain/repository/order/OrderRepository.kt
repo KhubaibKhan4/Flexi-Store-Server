@@ -10,11 +10,12 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 
 class OrderRepository : OrderDao {
     override suspend fun insert(
-        userId: Long,
+        userId: Int,
         productIds: String,
         totalQuantity: String,
         totalPrice: Double,
         orderProgress: String,
+        selectedColor: String,
         paymentType: String,
         trackingId: String
     ): Order? {
@@ -26,12 +27,20 @@ class OrderRepository : OrderDao {
                 order[OrderTable.totalQuantity] = totalQuantity
                 order[OrderTable.totalPrice] = totalPrice
                 order[OrderTable.orderProgress] = orderProgress
+                order[OrderTable.selectedColor] = selectedColor
                 order[OrderTable.paymentType] = paymentType
                 order[OrderTable.trackingId] = trackingId
             }
 
         }
         return rowToResult(statement?.resultedValues?.get(0)!!)
+    }
+
+    override suspend fun getAllOrdersByUserId(id: Int): List<Order> {
+        return DatabaseFactory.dbQuery {
+            OrderTable.select { OrderTable.userId eq id }
+                .mapNotNull { rowToResult(it) }
+        }
     }
 
     override suspend fun getOrderById(id: Long): Order? {
@@ -68,6 +77,7 @@ private fun rowToResult(row: ResultRow): Order? {
             totalQuantity = row[OrderTable.totalQuantity],
             totalPrice = row[OrderTable.totalPrice],
             orderProgress = row[OrderTable.orderProgress],
+            selectedColor = row[OrderTable.selectedColor],
             paymentType = row[OrderTable.paymentType],
             trackingId = row[OrderTable.trackingId]
         )

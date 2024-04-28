@@ -1655,7 +1655,7 @@ fun Route.order(
 ) {
     post("v1/order") {
         val parameters = call.receive<Parameters>()
-        val userId = parameters["userId"]?.toLongOrNull()
+        val userId = parameters["userId"]
             ?: return@post call.respondText(
                 text = "User ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
@@ -1675,6 +1675,11 @@ fun Route.order(
                 text = "Total Price Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
+        val selectedColor = parameters["selectedColor"]
+            ?: return@post call.respondText(
+                text = "selectedColor Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
         val paymentType = parameters["paymentType"]
             ?: return@post call.respondText(
                 text = "Payment Type Missing",
@@ -1683,11 +1688,12 @@ fun Route.order(
         val trackingId = UUID.randomUUID().toString()
         try {
             val order = db.insert(
-                userId = userId,
+                userId = userId.toInt(),
                 productIds = productIds,
                 totalQuantity = totalQuantity,
                 totalPrice = totalPrice,
                 orderProgress = "On Progress",
+                selectedColor = selectedColor,
                 paymentType = paymentType,
                 trackingId = trackingId
             )
@@ -1777,6 +1783,30 @@ fun Route.order(
                 call.respond(
                     status = HttpStatusCode.NotFound,
                     "Order not found for ID: $orderId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Order: ${e.message}"
+            )
+        }
+    }
+    get("v1/order/userId/{userId}") {
+        val orderId = call.parameters["userId"]
+            ?: return@get call.respondText(
+                text = "userId  Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
+        try {
+            val order = db.getAllOrdersByUserId(orderId.toInt())
+            if (order != null) {
+                call.respond(HttpStatusCode.OK, order)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "UserId not found for ID: $orderId"
                 )
             }
         } catch (e: Exception) {
