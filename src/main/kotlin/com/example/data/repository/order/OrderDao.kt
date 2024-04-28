@@ -5,9 +5,9 @@ import com.example.domain.model.order.Order
 interface OrderDao {
     suspend fun insert(
         userId: Int,
-        productIds: String,
+        productIds: Int,
         totalQuantity: String,
-        totalPrice: Double,
+        totalPrice: Int,
         orderProgress: String,
         selectedColor: String,
         paymentType: String,

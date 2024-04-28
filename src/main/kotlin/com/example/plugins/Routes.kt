@@ -1660,7 +1660,7 @@ fun Route.order(
                 text = "User ID Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
-        val productIds = parameters["productIds"]
+        val productIds = parameters["productIds"]?.toInt()
             ?: return@post call.respondText(
                 text = "Product IDs Missing",
                 status = HttpStatusCode.BadRequest
@@ -1670,7 +1670,7 @@ fun Route.order(
                 text = "Total Quantity Missing or Invalid",
                 status = HttpStatusCode.BadRequest
             )
-        val totalPrice = parameters["totalPrice"]?.toDoubleOrNull()
+        val totalPrice = parameters["totalPrice"]?.toInt()
             ?: return@post call.respondText(
                 text = "Total Price Missing or Invalid",
                 status = HttpStatusCode.BadRequest

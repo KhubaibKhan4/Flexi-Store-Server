@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 data class Order(
     val id: Long,
     val userId : Int,
-    val productIds: String,
+    val productIds: Int,
     val totalQuantity: String,
-    val totalPrice: Double,
+    val totalPrice: Int,
     val orderProgress: String,
     val selectedColor: String,
     val paymentType: String,

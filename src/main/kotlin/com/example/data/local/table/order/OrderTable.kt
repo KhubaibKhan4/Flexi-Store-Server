@@ -5,9 +5,9 @@ import org.jetbrains.exposed.sql.Table
 object OrderTable : Table("Orders") {
     val id = long("id").autoIncrement()
     val userId = integer("userId")
-    val productIds = varchar("productIds", length = 1000)
+    val productIds = integer("productIds")
     val totalQuantity = varchar("totalQuantity", length = 1000)
-    val totalPrice = double("totalPrice")
+    val totalPrice = integer("totalPrice")
     val orderProgress = varchar("orderProgress", length = 500)
     val selectedColor= varchar("selectedColor",1000)
     val paymentType = varchar("paymentType", length = 500)

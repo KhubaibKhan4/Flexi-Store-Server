@@ -11,9 +11,9 @@ import org.jetbrains.exposed.sql.statements.InsertStatement
 class OrderRepository : OrderDao {
     override suspend fun insert(
         userId: Int,
-        productIds: String,
+        productIds: Int,
         totalQuantity: String,
-        totalPrice: Double,
+        totalPrice: Int,
         orderProgress: String,
         selectedColor: String,
         paymentType: String,
