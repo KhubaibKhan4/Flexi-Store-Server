@@ -6,7 +6,7 @@ interface OrderDao {
     suspend fun insert(
         userId: Long,
         productIds: String,
-        totalQuantity: Int,
+        totalQuantity: String,
         totalPrice: Double,
         orderProgress: String,
         paymentType: String,

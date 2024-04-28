@@ -4,6 +4,7 @@ import com.example.data.local.table.db.DatabaseFactory
 import com.example.domain.repository.books.BooksRepository
 import com.example.domain.repository.cart.CartRepository
 import com.example.domain.repository.category.CategoryRepository
+import com.example.domain.repository.order.OrderRepository
 import com.example.domain.repository.product.ProductRepository
 import com.example.domain.repository.promotion.PromotionRepository
 import com.example.domain.repository.user.UsersRepository
@@ -19,6 +20,7 @@ fun Application.configureRouting() {
     val promotionDb = PromotionRepository()
     val booksDb = BooksRepository()
     val cartDb = CartRepository()
+    val orderDb = OrderRepository()
     routing {
         get("/") {
             call.respondText("Hello World!")
@@ -29,5 +31,6 @@ fun Application.configureRouting() {
         promotions(promotionDb)
         books(booksDb)
         carts(cartDb)
+        order(orderDb)
     }
 }
