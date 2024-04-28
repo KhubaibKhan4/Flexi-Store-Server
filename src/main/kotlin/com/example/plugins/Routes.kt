@@ -4,6 +4,7 @@ import com.example.domain.model.login.LoginResponse
 import com.example.domain.repository.books.BooksRepository
 import com.example.domain.repository.cart.CartRepository
 import com.example.domain.repository.category.CategoryRepository
+import com.example.domain.repository.order.OrderRepository
 import com.example.domain.repository.product.ProductRepository
 import com.example.domain.repository.promotion.PromotionRepository
 import com.example.domain.repository.user.UsersRepository
@@ -17,6 +18,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.*
 
 fun Route.users(
     db: UsersRepository
@@ -64,7 +66,18 @@ fun Route.users(
             status = HttpStatusCode.Unauthorized
         )
         try {
-            val users = db.insert(userName, email, password, fullName, address, city, country,postalCode, phoneNumber, userRole)
+            val users = db.insert(
+                userName,
+                email,
+                password,
+                fullName,
+                address,
+                city,
+                country,
+                postalCode,
+                phoneNumber,
+                userRole
+            )
             users?.id.let {
                 call.respond(
                     status = HttpStatusCode.OK,
@@ -214,7 +227,18 @@ fun Route.users(
         )
         try {
             val result = id.toLong().let { userId ->
-                db.updateUsers(userId, username, email, password, fullName, address, city,postalCode, country, phoneNumber)
+                db.updateUsers(
+                    userId,
+                    username,
+                    email,
+                    password,
+                    fullName,
+                    address,
+                    city,
+                    postalCode,
+                    country,
+                    phoneNumber
+                )
             }
             if (result == 1) {
                 call.respondText(
@@ -1615,7 +1639,7 @@ fun Route.carts(
             )
 
         try {
-            db.updateCartItem(cartId, productId, quantity,userId.toLong())
+            db.updateCartItem(cartId, productId, quantity, userId.toLong())
             call.respond(HttpStatusCode.OK, "Cart item updated successfully")
         } catch (e: Exception) {
             call.respond(
@@ -1624,4 +1648,143 @@ fun Route.carts(
             )
         }
     }
+}
+
+fun Route.order(
+    db: OrderRepository
+) {
+    post("v1/order") {
+        val parameters = call.receive<Parameters>()
+        val userId = parameters["userId"]?.toLongOrNull()
+            ?: return@post call.respondText(
+                text = "User ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val productIds = parameters["productIds"]
+            ?: return@post call.respondText(
+                text = "Product IDs Missing",
+                status = HttpStatusCode.BadRequest
+            )
+        val totalQuantity = parameters["totalQuantity"]?.toIntOrNull()
+            ?: return@post call.respondText(
+                text = "Total Quantity Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val totalPrice = parameters["totalPrice"]?.toDoubleOrNull()
+            ?: return@post call.respondText(
+                text = "Total Price Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val paymentType = parameters["paymentType"]
+            ?: return@post call.respondText(
+                text = "Payment Type Missing",
+                status = HttpStatusCode.BadRequest
+            )
+        val trackingId = UUID.randomUUID().toString()
+        try {
+            val order = db.insert(
+                userId = userId,
+                productIds = productIds,
+                totalQuantity = totalQuantity,
+                totalPrice = totalPrice,
+                orderProgress = "On Progress",
+                paymentType = paymentType,
+                trackingId = trackingId
+            )
+            order?.let {
+                call.respond(HttpStatusCode.OK, it)
+            } ?: call.respondText(
+                text = "Error while inserting order",
+                status = HttpStatusCode.InternalServerError
+            )
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Inserting Order: ${e.message}"
+            )
+        }
+    }
+    put("v1/order/{orderId}") {
+        val orderId = call.parameters["orderId"]?.toLongOrNull()
+            ?: return@put call.respondText(
+                text = "Order ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+        val parameters = call.receive<Parameters>()
+
+        val orderProgress = parameters["orderProgress"]
+            ?: return@put call.respondText(
+                text = "Payment Type Missing",
+                status = HttpStatusCode.BadRequest
+            )
+
+        try {
+            val updatedCount = db.updateOrderProgress(
+                id = orderId,
+                orderProgress = orderProgress
+            )
+            if (updatedCount > 0) {
+                call.respond(HttpStatusCode.OK, "Order updated successfully")
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Order not found or not updated"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Updating Order: ${e.message}"
+            )
+        }
+    }
+    delete("v1/order/{orderId}") {
+        val orderId = call.parameters["orderId"]?.toLongOrNull()
+            ?: return@delete call.respondText(
+                text = "Order ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
+        try {
+            val deletedCount = db.deleteOrderById(orderId)
+            if (deletedCount ==1) {
+                call.respond(HttpStatusCode.OK, "Order deleted successfully")
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Order not found or not deleted"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Deleting Order: ${e.message}"
+            )
+        }
+    }
+    get("v1/order/{orderId}") {
+        val orderId = call.parameters["orderId"]?.toLongOrNull()
+            ?: return@get call.respondText(
+                text = "Order ID Missing or Invalid",
+                status = HttpStatusCode.BadRequest
+            )
+
+        try {
+            val order = db.getOrderById(orderId)
+            if (order != null) {
+                call.respond(HttpStatusCode.OK, order)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "Order not found for ID: $orderId"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Order: ${e.message}"
+            )
+        }
+    }
+
 }
