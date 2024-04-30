@@ -1653,6 +1653,14 @@ fun Route.carts(
 fun Route.order(
     db: OrderRepository
 ) {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val currentDateAndTime = Date()
+    val calendar = Calendar.getInstance()
+    calendar.time = currentDateAndTime
+    calendar.add(Calendar.DAY_OF_YEAR, 4)
+    val deliveryDate = calendar.time
+    val formattedDeliveryDate: String = dateFormat.format(deliveryDate)
+
     post("v1/order") {
         val parameters = call.receive<Parameters>()
         val userId = parameters["userId"]
@@ -1695,7 +1703,9 @@ fun Route.order(
                 orderProgress = "On Progress",
                 selectedColor = selectedColor,
                 paymentType = paymentType,
-                trackingId = trackingId
+                trackingId = trackingId,
+                orderDate = currentDateAndTime.toString(),
+                deliveryDate = formattedDeliveryDate
             )
             order?.let {
                 call.respond(HttpStatusCode.OK, it)
@@ -1727,7 +1737,8 @@ fun Route.order(
         try {
             val updatedCount = db.updateOrderProgress(
                 id = orderId,
-                orderProgress = orderProgress
+                orderProgress = orderProgress,
+                currentTime = currentDateAndTime.toString()
             )
             if (updatedCount > 0) {
                 call.respond(HttpStatusCode.OK, "Order updated successfully")
@@ -1753,7 +1764,7 @@ fun Route.order(
 
         try {
             val deletedCount = db.deleteOrderById(orderId)
-            if (deletedCount ==1) {
+            if (deletedCount == 1) {
                 call.respond(HttpStatusCode.OK, "Order deleted successfully")
             } else {
                 call.respond(

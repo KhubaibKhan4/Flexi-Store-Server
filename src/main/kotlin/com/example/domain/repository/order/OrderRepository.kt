@@ -17,7 +17,9 @@ class OrderRepository : OrderDao {
         orderProgress: String,
         selectedColor: String,
         paymentType: String,
-        trackingId: String
+        trackingId: String,
+        orderDate: String,
+        deliveryDate: String
     ): Order? {
         var statement: InsertStatement<Number>? = null
         DatabaseFactory.dbQuery {
@@ -30,6 +32,8 @@ class OrderRepository : OrderDao {
                 order[OrderTable.selectedColor] = selectedColor
                 order[OrderTable.paymentType] = paymentType
                 order[OrderTable.trackingId] = trackingId
+                order[OrderTable.orderDate] = orderDate
+                order[OrderTable.deliveryDate] =deliveryDate
             }
 
         }
@@ -51,10 +55,11 @@ class OrderRepository : OrderDao {
         }
     }
 
-    override suspend fun updateOrderProgress(id: Long, orderProgress: String): Int {
+    override suspend fun updateOrderProgress(id: Long, orderProgress: String, currentTime: String): Int {
         return DatabaseFactory.dbQuery {
             OrderTable.update({ OrderTable.id eq id }) { order ->
                 order[OrderTable.orderProgress] = orderProgress
+                order[OrderTable.deliveryDate] = currentTime
             }
         }
     }
@@ -79,7 +84,9 @@ private fun rowToResult(row: ResultRow): Order? {
             orderProgress = row[OrderTable.orderProgress],
             selectedColor = row[OrderTable.selectedColor],
             paymentType = row[OrderTable.paymentType],
-            trackingId = row[OrderTable.trackingId]
+            trackingId = row[OrderTable.trackingId],
+            orderDate = row[OrderTable.orderDate],
+            deliveryDate = row[OrderTable.deliveryDate],
         )
     }
 }

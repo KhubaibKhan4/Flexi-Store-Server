@@ -12,6 +12,9 @@ object OrderTable : Table("Orders") {
     val selectedColor= varchar("selectedColor",1000)
     val paymentType = varchar("paymentType", length = 500)
     val trackingId = varchar("trackingId", length = 5000)
+    val orderDate= varchar("orderDate", length = 300)
+    val deliveryDate= varchar("deliveryDate", length = 300)
+
 
     override val primaryKey = PrimaryKey(id)
 }

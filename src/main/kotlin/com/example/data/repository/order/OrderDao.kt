@@ -11,13 +11,15 @@ interface OrderDao {
         orderProgress: String,
         selectedColor: String,
         paymentType: String,
-        trackingId: String
+        trackingId: String,
+        orderDate: String,
+        deliveryDate: String
     ): Order?
 
     suspend fun getAllOrdersByUserId(id:Int): List<Order>
     suspend fun getOrderById(id: Long): Order?
 
-    suspend fun updateOrderProgress(id: Long, orderProgress: String): Int
+    suspend fun updateOrderProgress(id: Long, orderProgress: String,currentTime: String): Int
 
     suspend fun deleteOrderById(id: Long): Int
 }
