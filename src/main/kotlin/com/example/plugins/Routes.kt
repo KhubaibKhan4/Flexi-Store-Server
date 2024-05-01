@@ -84,35 +84,39 @@ fun Route.users(
             status = HttpStatusCode.BadRequest
         )
         password ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "Password Missing",
             status = HttpStatusCode.BadRequest
         )
         fullName?: return@post call.respondText(
-            text = "Email Missing",
+            text = "fullName Missing",
             status = HttpStatusCode.BadRequest
         )
         address ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "address Missing",
             status = HttpStatusCode.BadRequest
         )
         city ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "city Missing",
             status = HttpStatusCode.BadRequest
         )
         country ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "country Missing",
             status = HttpStatusCode.BadRequest
         )
         postalCode ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "postalCode Missing",
             status = HttpStatusCode.BadRequest
         )
         phoneNumber ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "phoneNumber Missing",
             status = HttpStatusCode.BadRequest
         )
         userRole ?: return@post call.respondText(
-            text = "Email Missing",
+            text = "userRole Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        imageUrl ?: return@post call.respondText(
+            text = "Image Missing",
             status = HttpStatusCode.BadRequest
         )
 
