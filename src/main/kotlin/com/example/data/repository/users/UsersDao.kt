@@ -13,7 +13,8 @@ interface UsersDao {
         country: String,
         postalCode: Long,
         phoneNumber: String,
-        userRole: String
+        userRole: String,
+        profileImage: String
     ): Users?
     suspend fun login(
         email: String,
@@ -34,6 +35,7 @@ interface UsersDao {
         postalCode: Long,
         country: String,
         phoneNumber: String,
+        profileImage: String
     ): Int
     suspend fun updateAddress(
         id: Long,
@@ -42,4 +44,8 @@ interface UsersDao {
         country: String,
         postalCode: Long
     ): Int
+    suspend fun updateProfile(
+        id: Long,
+        profileImage: String
+    ):Int
 }

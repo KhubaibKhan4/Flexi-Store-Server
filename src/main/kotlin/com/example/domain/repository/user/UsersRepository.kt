@@ -38,7 +38,8 @@ class UsersRepository : UsersDao {
                 country = row[UserTable.country],
                 postalCode = row[UserTable.postalCode],
                 phoneNumber = row[UserTable.phoneNumber],
-                userRole = row[UserTable.userRole]
+                userRole = row[UserTable.userRole],
+                profileImage = row[UserTable.profileImage]
             )
         }
     }
@@ -54,7 +55,8 @@ class UsersRepository : UsersDao {
         country: String,
         postalCode: Long,
         phoneNumber: String,
-        userRole: String
+        userRole: String,
+        profileImage: String
     ): Users? {
         var statement: InsertStatement<Number>? = null
         DatabaseFactory.dbQuery {
@@ -69,6 +71,7 @@ class UsersRepository : UsersDao {
                 users[UserTable.postalCode] = postalCode
                 users[UserTable.phoneNumber] = phoneNumber
                 users[UserTable.userRole] = userRole
+                users[UserTable.profileImage] = profileImage
             }
         }
         return rowToResult(statement?.resultedValues?.get(0)!!)
@@ -118,7 +121,8 @@ class UsersRepository : UsersDao {
         city: String,
         postalCode: Long,
         country: String,
-        phoneNumber: String
+        phoneNumber: String,
+        profileImage: String
     ): Int =
         DatabaseFactory.dbQuery {
             UserTable.update({ UserTable.id.eq(id) }) { user ->
@@ -132,6 +136,7 @@ class UsersRepository : UsersDao {
                 user[UserTable.country]= country
                 user[UserTable.postalCode] = postalCode
                 user[UserTable.phoneNumber] = phoneNumber
+                user[UserTable.profileImage]= profileImage
             }
         }
 
@@ -150,6 +155,15 @@ class UsersRepository : UsersDao {
                 user[UserTable.postalCode] = postalCode
             }
         }
+
+    override suspend fun updateProfile(id: Long, profileImage: String): Int =
+        DatabaseFactory.dbQuery {
+            UserTable.update({UserTable.id.eq(id)}){user->
+                user[UserTable.id] = id
+                user[UserTable.profileImage] = profileImage
+            }
+        }
+
 
     private val jwtVerifier : JWTVerifier = JWT.require(Algorithm.HMAC256(jwtSecret))
         .withAudience(jwtAudience)

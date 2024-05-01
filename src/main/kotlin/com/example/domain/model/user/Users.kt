@@ -14,5 +14,6 @@ data class Users(
     val country: String,
     val postalCode: Long,
     val phoneNumber: String,
-    val userRole: String
+    val userRole: String,
+    val profileImage: String
 )
