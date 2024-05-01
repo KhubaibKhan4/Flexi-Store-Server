@@ -15,7 +15,7 @@ object UserTable : Table("Users") {
     val postalCode: Column<Long> = long("postal_code")
     val phoneNumber: Column<String> = varchar("phoneNumber", length = 130)
     val userRole: Column<String> = varchar("userRole", length = 51)
-    val profileImage: Column<String> = varchar("profileImage", length = 1000)
+    val profileImage: Column<String> = varchar("profileimage", length = 1000)
 
     override val primaryKey: PrimaryKey = PrimaryKey(id)
 }

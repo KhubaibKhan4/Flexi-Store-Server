@@ -15,5 +15,5 @@ data class Users(
     val postalCode: Long,
     val phoneNumber: String,
     val userRole: String,
-    val profileImage: String
+    val profileImage: String?
 )
