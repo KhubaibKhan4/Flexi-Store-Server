@@ -164,6 +164,14 @@ class UsersRepository : UsersDao {
             }
         }
 
+    override suspend fun updateCountry(id: Long, countryName: String): Int =
+        DatabaseFactory.dbQuery {
+            UserTable.update({UserTable.id.eq(id)}){user->
+                user[UserTable.id]= id
+                user[UserTable.country] = countryName
+            }
+        }
+
 
     private val jwtVerifier : JWTVerifier = JWT.require(Algorithm.HMAC256(jwtSecret))
         .withAudience(jwtAudience)

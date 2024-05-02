@@ -48,4 +48,8 @@ interface UsersDao {
         id: Long,
         profileImage: String
     ):Int
+    suspend fun updateCountry(
+        id: Long,
+        countryName: String
+    ):Int
 }

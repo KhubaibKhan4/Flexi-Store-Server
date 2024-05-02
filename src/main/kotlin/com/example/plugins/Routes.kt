@@ -410,6 +410,43 @@ fun Route.users(
             )
         }
     }
+
+    put("v1/users/country/{id}") {
+        val id = call.parameters["id"] ?: return@put call.respondText(
+            text = "Id Not Found",
+            status = HttpStatusCode.NotFound
+        )
+        val parameters = call.receive<Parameters>()
+
+        val countryName = parameters["countryName"] ?: return@put call.respondText(
+            text = "countryName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+
+
+        try {
+            val result = id.toLong().let { userId ->
+                db.updateCountry(userId,countryName)
+            }
+            if (result == 1) {
+                call.respondText(
+                    text = "Update Successfully...",
+                    status = HttpStatusCode.OK
+                )
+            } else {
+                call.respondText(
+                    "Something Went Wrong...",
+                    status = HttpStatusCode.BadRequest
+                )
+            }
+
+        } catch (e: Exception) {
+            call.respondText(
+                text = e.message.toString(),
+                status = HttpStatusCode.BadRequest
+            )
+        }
+    }
     put("v1/users/profileImage/{id}") {
         val id = call.parameters["id"]?.toLongOrNull() ?: return@put call.respondText(
             text = "Invalid user ID",
