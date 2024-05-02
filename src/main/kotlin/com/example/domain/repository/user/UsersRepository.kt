@@ -140,6 +140,31 @@ class UsersRepository : UsersDao {
             }
         }
 
+    override suspend fun updateUsersDetail(
+        id: Long,
+        username: String,
+        email: String,
+        fullName: String,
+        address: String,
+        city: String,
+        postalCode: Long,
+        country: String,
+        phoneNumber: String
+    ): Int =
+        DatabaseFactory.dbQuery {
+            UserTable.update({ UserTable.id.eq(id) }) { user ->
+                user[UserTable.id] = id
+                user[UserTable.username] = username
+                user[UserTable.email] = email
+                user[UserTable.fullName] = fullName
+                user[UserTable.address] = address
+                user[UserTable.city] = city
+                user[UserTable.country]= country
+                user[UserTable.postalCode] = postalCode
+                user[UserTable.phoneNumber] = phoneNumber
+            }
+        }
+
     override suspend fun updateAddress(
         id: Long,
         address: String,

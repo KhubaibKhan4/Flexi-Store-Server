@@ -37,6 +37,17 @@ interface UsersDao {
         phoneNumber: String,
         profileImage: String
     ): Int
+    suspend fun updateUsersDetail(
+        id: Long,
+        username: String,
+        email: String,
+        fullName: String,
+        address: String,
+        city: String,
+        postalCode: Long,
+        country: String,
+        phoneNumber: String
+    ): Int
     suspend fun updateAddress(
         id: Long,
         address: String,
