@@ -16,6 +16,19 @@ interface UsersDao {
         userRole: String,
         profileImage: String
     ): Users?
+    suspend fun signupUser(
+        username: String,
+        email: String,
+        password: String,
+        fullName: String,
+        address: String,
+        city: String,
+        country: String,
+        postalCode: Long,
+        phoneNumber: String,
+        userRole: String,
+        profileImage: String
+    ): Users?
     suspend fun login(
         email: String,
         password: String

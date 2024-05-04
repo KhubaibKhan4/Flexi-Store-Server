@@ -77,6 +77,38 @@ class UsersRepository : UsersDao {
         return rowToResult(statement?.resultedValues?.get(0)!!)
     }
 
+    override suspend fun signupUser(
+        username: String,
+        email: String,
+        password: String,
+        fullName: String,
+        address: String,
+        city: String,
+        country: String,
+        postalCode: Long,
+        phoneNumber: String,
+        userRole: String,
+        profileImage: String
+    ): Users? {
+        var statement: InsertStatement<Number>? = null
+        DatabaseFactory.dbQuery {
+            statement = UserTable.insert { users ->
+                users[UserTable.username] = username
+                users[UserTable.email] = email
+                users[UserTable.password] = hashPassword(password)
+                users[UserTable.fullName] = fullName
+                users[UserTable.address] = address
+                users[UserTable.city] = city
+                users[UserTable.country] = country
+                users[UserTable.postalCode] = postalCode
+                users[UserTable.phoneNumber] = phoneNumber
+                users[UserTable.userRole] = userRole
+                users[UserTable.profileImage] = profileImage
+            }
+        }
+        return rowToResult(statement?.resultedValues?.get(0)!!)
+    }
+
     override suspend fun login(email: String, password: String): Users? {
         var user: Users? = null
         transaction {

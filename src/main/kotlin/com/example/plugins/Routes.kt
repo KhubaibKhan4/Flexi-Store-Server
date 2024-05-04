@@ -59,7 +59,6 @@ fun Route.users(
                         "userRole" -> userRole = part.value
                     }
                 }
-
                 is PartData.FileItem -> {
                     val fileName = part.originalFileName?.replace(" ", "_") ?: "image${System.currentTimeMillis()}"
                     val file = File("upload/products/users", fileName)
@@ -134,6 +133,80 @@ fun Route.users(
                 phoneNumber!!,
                 userRole!!,
                 imageUrl!!
+            )
+            user?.id?.let {
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    "User uploaded to server successfully: $user"
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error while uploading data to server: ${e.message}"
+            )
+        }
+    }
+    post("v1/signup") {
+        val parameters = call.receive<Parameters>()
+        val email = parameters["email"] ?: return@post call.respondText(
+            text = "Email Missing",
+            status = HttpStatusCode.Unauthorized
+        )
+        val password = parameters["password"] ?: return@post call.respondText(
+            text = "Password Missing",
+            status = HttpStatusCode.Unauthorized
+        )
+       val userName= parameters["userName"] ?: return@post call.respondText(
+            text = "Username Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val fullName= parameters["fullName"] ?: return@post call.respondText(
+            text = "fullName Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val address= parameters["address"] ?: return@post call.respondText(
+            text = "address Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val city= parameters["city"] ?: return@post call.respondText(
+            text = "city Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val country= parameters["country"] ?: return@post call.respondText(
+            text = "country Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val postalCode= parameters["postalCode"]?.toLongOrNull() ?: return@post call.respondText(
+            text = "postalCode Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val phoneNumber= parameters["phoneNumber"] ?: return@post call.respondText(
+            text = "phoneNumber Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val userRole= parameters["userRole"] ?: return@post call.respondText(
+            text = "userRole Missing",
+            status = HttpStatusCode.BadRequest
+        )
+        val imageUrl= parameters["imageUrl"] ?: return@post call.respondText(
+            text = "imageUrl Missing",
+            status = HttpStatusCode.BadRequest
+        )
+
+        try {
+            val user = db.insert(
+                userName,
+                email,
+                password,
+                fullName,
+                address,
+                city,
+                country,
+                postalCode,
+                phoneNumber,
+                userRole,
+                imageUrl
             )
             user?.id?.let {
                 call.respond(
