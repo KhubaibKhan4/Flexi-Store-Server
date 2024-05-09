@@ -1,0 +1,1 @@
+web: java -jar build/libs/com.example.store-server-all.jar

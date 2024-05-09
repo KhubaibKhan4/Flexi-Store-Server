@@ -14,8 +14,13 @@ plugins {
     kotlin("jvm") version "1.9.23"
     id("io.ktor.plugin") version "2.3.9"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    id("com.github.johnrengelman.shadow")
 }
-
+tasks.shadowJar {
+    manifest {
+        attributes["Main-Class"] = "com.realtor.ApplicationKt"
+    }
+}
 group = "com.example"
 version = "0.0.1"
 
@@ -39,6 +44,14 @@ tasks.processResources {
             )
         )
     }
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.compileJava {
+    options.compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
 }
 repositories {
     mavenCentral()
@@ -64,4 +77,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikaricp_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("org.postgresql:postgresql:$postgres_version")
+}
+tasks.create("stage") {
+    dependsOn("installDist")
 }
