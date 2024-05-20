@@ -43,6 +43,10 @@ To install Flexi Store Server locally, follow these steps:
    ```
    ./gradlew run
     ```
+
+## Flexi-Store-KMP
+
+Flexi-Store is developed using Ktor and is mandatory for the backend of the Flexi-Store-KMP. You can find the Flexi-Store-KMP repository [here](https://github.com/KhubaibKhan4/Flexi-Store-KMP).
 # API Endpoints
 
 ## Users
@@ -102,7 +106,3 @@ Contributions are welcome! Please check the CONTRIBUTING.md file for guidelines.
 # License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-
-   
