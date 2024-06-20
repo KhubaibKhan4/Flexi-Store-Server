@@ -16,6 +16,7 @@ interface OrderDao {
         deliveryDate: String
     ): Order?
 
+    suspend fun getAllOrders(): List<Order>
     suspend fun getAllOrdersByUserId(id:Int): List<Order>
     suspend fun getOrderById(id: Long): Order?
 

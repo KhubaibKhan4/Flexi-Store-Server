@@ -2173,5 +2173,24 @@ fun Route.order(
             )
         }
     }
+    get("v1/order") {
+
+        try {
+            val order = db.getAllOrders()
+            if (order != null) {
+                call.respond(HttpStatusCode.OK, order)
+            } else {
+                call.respond(
+                    status = HttpStatusCode.NotFound,
+                    "No Orders Found Yet."
+                )
+            }
+        } catch (e: Exception) {
+            call.respond(
+                status = HttpStatusCode.InternalServerError,
+                "Error While Fetching Order: ${e.message}"
+            )
+        }
+    }
 
 }

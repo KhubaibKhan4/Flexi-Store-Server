@@ -40,6 +40,12 @@ class OrderRepository : OrderDao {
         return rowToResult(statement?.resultedValues?.get(0)!!)
     }
 
+    override suspend fun getAllOrders(): List<Order> {
+        return DatabaseFactory.dbQuery {
+            OrderTable.selectAll().mapNotNull { rowToResult(it) }
+        }
+    }
+
     override suspend fun getAllOrdersByUserId(id: Int): List<Order> {
         return DatabaseFactory.dbQuery {
             OrderTable.select { OrderTable.userId eq id }
