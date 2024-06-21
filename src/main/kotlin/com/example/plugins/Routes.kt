@@ -1098,6 +1098,31 @@ fun Route.products(
         }
     }
 
+    get("v1/products/multiple") {
+        val idsString = call.request.queryParameters["ids"]
+        if (idsString.isNullOrBlank()) {
+            call.respond(HttpStatusCode.BadRequest, "No product IDs provided")
+            return@get
+        }
+
+        val ids = idsString.split(",").mapNotNull { it.toLongOrNull() }
+        if (ids.isEmpty()) {
+            call.respond(HttpStatusCode.BadRequest, "Invalid product IDs provided")
+            return@get
+        }
+
+        try {
+            val products = db.getProductsByMultipleIds(ids)
+            if (products.isNullOrEmpty()) {
+                call.respond(HttpStatusCode.NotFound, "No products found for the provided IDs")
+            } else {
+                call.respond(HttpStatusCode.OK, products)
+            }
+        } catch (e: Exception) {
+            call.respond(HttpStatusCode.InternalServerError, "Error while fetching products: ${e.message}")
+        }
+    }
+
     put("v1/products/{id}") {
         val id = call.parameters["id"]?.toLongOrNull() ?: return@put call.respondText(
             text = "Invalid or Missing Product ID",
