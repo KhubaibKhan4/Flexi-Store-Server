@@ -45,11 +45,11 @@ To install Flexi Store Server locally, follow these steps:
     ```
 ## Setup
 Remember you need to setup the Flexi-Store Server to use the Flexi-Store Applications. It's mandatory, otherwise it will not work at all. To Setup, you need to clone this on your local device. Open it in the Intellij IDEA. 
-After Cloning the project, You need to download the `PG Admin 4` from there official website and install it. After Installing that, You need to create a data with any name. Now, open the Intellij IDEA where your cloning project is running, Click on `Edit / Run Configuration > Environment Variables >`, here you need to add two values inside the variables. `JDBC_DATABASE_URL= jdbc:postgresql:databaseName?user=postgres&password=yourpass` & `JDBC_DRIVER= org.postgresql.Driver`. After Adding these into your Environment Variables, You are good to go. 
+After Cloning the project, You need to download the `PG Admin 4` from there official website and install it. After Installing that, You need to create a data with any name. Now, open the Intellij IDEA where your cloning project is running, Click on `Edit / Run Configuration > Environment Variables >`, here you need to add two values inside the variables. `JDBC_DATABASE_URL= jdbc:postgresql:databaseName?user=postgres&password=yourpass` & `JDBC_DRIVER= org.postgresql.Driver`. After Adding these into your Environment Variables, You are good to go. To Use this Server inside your Application Locally, You need to simply get the local ip. For that you need to `Terminal` or `Command Prompt`. Get the Local IP and replace the base URL `kotlin/utils/Constant.kt` & URL `http://your_ip:8080/`. If you still gets any error, Please create an issue here.
 
 ## Flexi-Store-KMP
 
-Flexi-Store is developed using Ktor and is mandatory for the backend of the Flexi-Store-KMP. You can find the Flexi-Store-KMP repository [here](https://github.com/KhubaibKhan4/Flexi-Store-KMP).
+Flexi-Store is developed using Ktor and is mandatory for the backend of the Flexi-Store-KMP. You can find the Flexi-Store-KMP repository [here](https://github.com/KhubaibKhan4/Flexi-Store-KMP). 
 
 # API Endpoints
 
