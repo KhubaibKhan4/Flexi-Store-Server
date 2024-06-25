@@ -1167,7 +1167,7 @@ fun Route.products(
                     when (partData.name) {
                         "name" -> name = partData.value
                         "description" -> description = partData.value
-                        "price" -> price = partData.value.toLong()
+                        "price" -> price = partData.value.toLongOrNull()
                         "categoryId" -> categoryId = partData.value.toLongOrNull()
                         "categoryTitle" -> categoryTitle = partData.value
                         "created_at" -> created_at = partData.value
@@ -1186,54 +1186,59 @@ fun Route.products(
                     }
                 }
 
-                else -> {
-
-                }
+                else -> {}
             }
         }
+
+        val currentProduct = db.getProductById(id) ?: return@put call.respondText(
+            text = "Product with ID $id not found",
+            status = HttpStatusCode.NotFound
+        )
+
+        val updatedProduct = currentProduct.copy(
+            name = name ?: currentProduct.name,
+            description = description ?: currentProduct.description,
+            price = price ?: currentProduct.price,
+            categoryId = categoryId ?: currentProduct.categoryId,
+            categoryTitle = categoryTitle ?: currentProduct.categoryTitle,
+            imageUrl = imageUrl ?: currentProduct.imageUrl,
+            created_at = created_at ?: currentProduct.created_at,
+            updated_at = updated_at ?: currentProduct.updated_at,
+            total_stack = total_stack ?: currentProduct.total_stack,
+            brand = brand ?: currentProduct.brand,
+            weight = weight ?: currentProduct.weight,
+            dimensions = dimensions ?: currentProduct.dimensions,
+            isAvailable = isAvailable ?: currentProduct.isAvailable,
+            discountPrice = discountPrice ?: currentProduct.discountPrice,
+            promotionDescription = promotionDescription ?: currentProduct.promotionDescription,
+            averageRating = averageRating ?: currentProduct.averageRating,
+            isFeatured = isFeature ?: currentProduct.isFeatured,
+            manufacturer = manufacturer ?: currentProduct.manufacturer,
+            colors = colors ?: currentProduct.colors
+        )
+
         try {
             val result = db.updateProductById(
                 id,
-                name ?: return@put call.respondText("Name Missing", status = HttpStatusCode.BadRequest),
-                description ?: return@put call.respondText("Description Missing", status = HttpStatusCode.BadRequest),
-                price ?: return@put call.respondText("Price Missing or Invalid", status = HttpStatusCode.BadRequest),
-                categoryId ?: return@put call.respondText(
-                    "Category ID Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                ),
-                categoryTitle ?: return@put call.respondText(
-                    "Category Title Missing",
-                    status = HttpStatusCode.BadRequest
-                ),
-                imageUrl ?: return@put call.respondText("Image URL Missing", status = HttpStatusCode.BadRequest),
-                created_at ?: return@put call.respondText("Created At Missing", status = HttpStatusCode.BadRequest),
-                updated_at ?: return@put call.respondText("Updated At Missing", status = HttpStatusCode.BadRequest),
-                total_stack ?: return@put call.respondText(
-                    "Total Stack Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                ),
-                brand ?: return@put call.respondText("Brand Missing", status = HttpStatusCode.BadRequest),
-                weight ?: return@put call.respondText("Weight Missing or Invalid", status = HttpStatusCode.BadRequest),
-                dimensions ?: return@put call.respondText("Dimensions Missing", status = HttpStatusCode.BadRequest),
-                isAvailable ?: false,
-                discountPrice ?: return@put call.respondText(
-                    "Discount Price Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                ),
-                promotionDescription ?: "",
-                averageRating ?: 0.0,
-                isFeature ?: return@put call.respondText(
-                    "isFeature Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                ),
-                manufacturer ?: return@put call.respondText(
-                    "manufacturer Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                ),
-                colors ?: return@put call.respondText(
-                    "colors Missing or Invalid",
-                    status = HttpStatusCode.BadRequest
-                )
+                updatedProduct.name,
+                updatedProduct.description,
+                updatedProduct.price,
+                updatedProduct.categoryId,
+                updatedProduct.categoryTitle,
+                updatedProduct.imageUrl,
+                updatedProduct.created_at,
+                updatedProduct.updated_at,
+                updatedProduct.total_stack,
+                updatedProduct.brand,
+                updatedProduct.weight,
+                updatedProduct.dimensions,
+                updatedProduct.isAvailable,
+                updatedProduct.discountPrice,
+                updatedProduct.promotionDescription,
+                updatedProduct.averageRating,
+                updatedProduct.isFeatured,
+                updatedProduct.manufacturer,
+                updatedProduct.colors
             )
 
             if (result != null && result > 0) {
@@ -1247,14 +1252,12 @@ fun Route.products(
                     "Product with ID $id not found"
                 )
             }
-
         } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.BadRequest,
-                "Error While Updating Products ${e.message}"
+                "Error While Updating Product: ${e.message}"
             )
         }
-
     }
 
 }
