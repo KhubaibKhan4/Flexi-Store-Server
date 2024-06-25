@@ -831,7 +831,6 @@ fun Route.category(
                         file.outputStream().buffered().use { output ->
                             input.copyTo(output)
                         }
-
                     }
                     imageUrl = "/upload/products/categories/${fileName}"
                 }
@@ -840,25 +839,25 @@ fun Route.category(
             }
         }
 
-        name ?: return@put call.respond(
-            status = HttpStatusCode.BadRequest,
-            "Name Missing"
-        )
-        description ?: return@put call.respond(
-            status = HttpStatusCode.BadRequest,
-            "Description Missing"
-        )
-        isVisible ?: return@put call.respond(
-            status = HttpStatusCode.BadRequest,
-            "isVisible Missing"
-        )
-        imageUrl ?: return@put call.respond(
-            status = HttpStatusCode.BadRequest,
-            "ImageUrl Missing"
-        )
+        if (name == null && description == null && isVisible == null && imageUrl == null) {
+            return@put call.respond(
+                status = HttpStatusCode.BadRequest,
+                "No fields to update"
+            )
+        }
 
         try {
-            val result = db.updateCategoryById(id, name!!, description!!, isVisible!!, imageUrl!!)
+            val existingCategory = db.getCategoryById(id) ?: return@put call.respond(
+                status = HttpStatusCode.NotFound,
+                "Category not found"
+            )
+
+            val updatedName = name ?: existingCategory.name
+            val updatedDescription = description ?: existingCategory.description
+            val updatedIsVisible = isVisible ?: existingCategory.isVisible
+            val updatedImageUrl = imageUrl ?: existingCategory.imageUrl
+
+            val result = db.updateCategoryById(id, updatedName, updatedDescription, updatedIsVisible, updatedImageUrl)
             if (result == 1) {
                 call.respond(HttpStatusCode.OK, "Update Successfully")
             } else {
@@ -867,7 +866,6 @@ fun Route.category(
                     "Something Went Wrong..."
                 )
             }
-
         } catch (e: Exception) {
             call.respond(
                 status = HttpStatusCode.Unauthorized,
@@ -875,6 +873,7 @@ fun Route.category(
             )
         }
     }
+
 }
 
 fun Route.products(
