@@ -24,6 +24,9 @@ Flexi Store is a server-side application designed to support ecommerce functiona
 - Secure API endpoints for interacting with the server
 - Flexible and scalable architecture for accommodating future enhancements
 
+## Future Plans 
+- Deployment on Heroku or Google.
+
 ## Installation
 
 To install Flexi Store Server locally, follow these steps:
