@@ -11,7 +11,7 @@ Flexi Store is an Ecommerce Application Server designed to provide a flexible an
 - [API Endpoints](#api-endpoints)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
-- [License](#license)
+- [License](#license) 
 
 ## Introduction
 
