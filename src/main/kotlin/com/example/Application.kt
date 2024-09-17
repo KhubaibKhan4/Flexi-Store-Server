@@ -22,7 +22,7 @@ fun Application.module() {
     routing {
         static("upload") {
             static("products") {
-                files("D:\\KMP Projects\\store-server\\upload\\products")
+                files("/Users/rabeetahmad/IdeaProjects/Flexi-Store-Server/upload/products")
             }
         }
     }

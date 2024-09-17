@@ -46,12 +46,12 @@ tasks.processResources {
     }
 }
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
 }
 
 tasks.compileJava {
-    options.compilerArgs.addAll(listOf("-source", "11", "-target", "11"))
+    options.compilerArgs.addAll(listOf("-source", "20", "-target", "20"))
 }
 repositories {
     mavenCentral()
