@@ -114,27 +114,142 @@ Flexi-Store is developed using Ktor and is mandatory for the backend of the Flex
 
 ## Categories
 
-- **POST /v1/categories**: Create a new category.
-- **GET /v1/categories**: Get all categories.
-- **GET /v1/categories/{id}**: Get category by ID.
-- **DELETE /v1/categories/{id}**: Delete category by ID.
-- **PUT /v1/categories/{id}**: Update category by ID.
+#### Create New Category
+
+```http
+  POST /v1/categories
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `api-key`      | `string` | **Not Required**. api-key for authentication |
+
+#### Get All Categories
+
+```http
+  GET /v1/categories
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `api-key`      | `string` | **Not Required**. api-key for authentication |
+
+#### Get Category By ID
+
+```http
+  GET /v1/categories/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of Category |
+
+#### DELETE Category By ID
+
+```http
+  DELETE /v1/categories/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of Category |
+
+### Update Category
+```http
+  PUT /v1/categories/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of Category |
 
 ## Products
 
-- **POST /v1/products**: Create a new product.
-- **GET /v1/products**: Get all products.
-- **GET /v1/products/{id}**: Get product by ID.
-- **DELETE /v1/products/{id}**: Delete product by ID.
-- **PUT /v1/products/{id}**: Update product by ID.
+### Create New Product
+```http
+  POST /v1/products
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `api-key`      | `string` | **Required**. api-key for Authentication |
+
+### Get Product
+```http
+  GET /v1/products/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for products |
+
+### DELETE Product
+```http
+  DELETE /v1/products/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for products |
+
+### Update Product
+```http
+  PUT /v1/products/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for products |
+
 
 ## Promotions Cards
 
-- **POST /v1/promotions**: Create a new promotions product.
-- **GET /v1/promotions**: Get all promotions products.
-- **GET /v1/promotions/{id}**: Get promotions product by ID.
-- **DELETE /v1/promotions/{id}**: Delete promotions product by ID.
-- **PUT /v1/promotions/{id}**: Update promotions product by ID.
+### Create New Promotions
+```http
+  POST /v1/promotions
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `api-key`      | `string` | **Required**. api-key for Authentication |
+
+### Get All Promotions
+```http
+  GET /v1/promotions
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `api-key`      | `string` | **Required**. api-key for Authentication |
+
+### Get Single Promotion
+```http
+  GET /v1/promotions/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for promotion |
+
+
+### Delete Promotion
+```http
+  DELETE /v1/promotions/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for promotion |
+
+### Update Promotion
+```http
+  PUT /v1/promotions/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. id for promotion |
+
 
   ## 💰 You can help me by Donating
   [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/khubaibkhan) [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/18.bscs) [![Patreon](https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white)](https://patreon.com/MuhammadKhubaibImtiaz) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/muhammadkhubaibimtiaz) 
