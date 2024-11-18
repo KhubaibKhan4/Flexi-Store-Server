@@ -107,6 +107,14 @@ Flexi-Store is developed using Ktor and is mandatory for the backend of the Flex
 ![Screenshot 10](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/10.png)
 ![Screenshot 11](https://github.com/KhubaibKhan4/Flexi-Store-Server/blob/master/assests/screenshots/11.png)
 
+**Stargazers**
+
+[![Stargazers repo roster for @KhubaibKhan4/Flexi-Store-Server](http://reporoster.com/stars/dark/KhubaibKhan4/Flexi-Store-Server)](https://github.com/KhubaibKhan4/Flexi-Store-Server/stargazers)
+
+**Forkers**
+
+[![Forkers repo roster for @KhubaibKhan4/Flexi-Store-Server](http://reporoster.com/forks/dark/KhubaibKhan4/Flexi-Store-Server)](https://github.com/KhubaibKhan4/Flexi-Store-Server/network/members)
+
 # Contributing
 
 Contributions are welcome! Please check the CONTRIBUTING.md file for guidelines.
