@@ -59,12 +59,58 @@ Flexi-Store is developed using Ktor and is mandatory for the backend of the Flex
 
 ## Users
 
-- **POST /v1/users**: Create a new user.
-- **POST /v1/login**: Authenticate user login.
-- **GET /v1/users**: Get all users.
-- **GET /v1/users/{id}**: Get user by ID.
-- **DELETE /v1/users/{id}**: Delete user by ID.
-- **PUT /v1/users/{id}**: Update user by ID.
+#### Get all Users
+
+```http
+  GET /v1/users
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `api_key` | `string` | **Not Required**. Your API key |
+
+#### Get Single User
+
+```http
+  GET /v1/users/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of item to fetch |
+
+#### Create a New User
+
+```http
+  POST /v1/users
+```
+
+#### Login
+
+```http
+  GET /v1/login
+```
+
+#### Delete Single User
+
+```http
+  DELETE /v1/users/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of users to delete data |
+
+#### Update Single User
+
+```http
+  PUT /v1/users/{id}
+```
+
+| Parameter | Type     | Description                       |
+| :-------- | :------- | :-------------------------------- |
+| `id`      | `string` | **Required**. Id of users to update data |
+
 
 ## Categories
 
